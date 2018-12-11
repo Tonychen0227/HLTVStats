@@ -17,6 +17,9 @@
   },
   "homepage": "https://github.com/Tonychen0227/HLTVStats#readme",
   "dependencies": {
+    "body-parser": "^1.18.3",
+    "ejs": "^2.6.1",
+    "express": "^4.16.4",
     "hltv": "^2.9.2",
     "http-proxy": "^1.17.0",
     "request": "^2.88.0",
