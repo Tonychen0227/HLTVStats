@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Match Finder</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
+  </head>
+  <body>
+    <fieldset>
+        <div class="container">
+            <form action="/" method="post">
+                <input type="submit" class="ghost-button" value="Get Matches">
+            </form>
+        </div>
+    </fieldset>
+    <% if(matches !== null){ %>
+        <ul>
+            <% for(var i=0; i < matches.length; i++) { %>
+                <li><p><%= JSON.stringify(matches[i]) %></p></li>
+            <% } %>
+            </ul>
+    <% } %>
+    <% if(error !== null){ %>
+        <p><%= error %></p>
+    <% } %>
+      
+  </body>
+</html>
