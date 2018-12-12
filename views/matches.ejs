@@ -2,21 +2,16 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Match Finder</title>
+    <title>Matches</title>
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
   </head>
   <body>
     <fieldset>
-        <h1 align="center"> HLTV Stats (By: Tony Chen) </h1>
-        <h5 align="center"> Designed to be a non-data-heavy HLTV site </h5>
+        <h1 align="center"> Matches </h1>
         <div class="container">
-            <form action="/matches" method="get">
-                <input type="submit" class="ghost-button" value="Get Matches">
-            </form>
-            <br>
-            <form action="/results" method="get">
-                <input type="submit" class="ghost-button" value="Get results">
+            <form action="/" method="get">
+                <input type="submit" class="ghost-button" value="Back to Home">
             </form>
         </div>
     </fieldset>
@@ -29,7 +24,7 @@
                     <li>
                         <p><%= matches[i].team1.name %> vs <%= matches[i].team2.name %> (<%= matches[i].format %>)</p>
                         <p><%= matches[i].event.name %></p>
-                        <p> <a href="/scorebot?id=<%= matches[i].id %>"> Connect to Scorebot </a></p>
+                        <p> <a href="matches/scorebot?id=<%= matches[i].id %>"> Connect to Scorebot </a></p>
                     </li>
                     <% } %>
                 <% } %>
@@ -42,7 +37,7 @@
                     <li>
                     <p><%= matches[i].team1.name %> vs <%= matches[i].team2.name %> (<%= matches[i].format %>)</p>
                     <p><%= matches[i].event.name %> </p>
-                    <p> <a href="/matchanalysis?id=<%= matches[i].id %>"> Analysis </a></p>
+                    <p> <a href="matches/matchanalysis?id=<%= matches[i].id %>"> Analysis </a></p>
                     </li>   
                 <% } else {%>
                 <% } %>
