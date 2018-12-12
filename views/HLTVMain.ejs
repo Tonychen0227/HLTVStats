@@ -8,22 +8,49 @@
   </head>
   <body>
     <fieldset>
+        <h1 align="center"> HLTV Stats (By: Tony Chen) </h1>
         <div class="container">
-            <form action="/" method="post">
+            <form action="/matches" method="get">
                 <input type="submit" class="ghost-button" value="Get Matches">
+            </form>
+            <br>
+            <br>
+            <form action="/results" method="get">
+                <input type="submit" class="ghost-button" value="Get results">
             </form>
         </div>
     </fieldset>
     <% if(matches !== null){ %>
+        <% if(matches[0].live){ %>
+            <h3> LIVE MATCHES </h3>
+            <ul>
+                <% for(var i=0; i < matches.length; i++) { %>
+                    <% if(matches[i].live){ %>
+                    <li>
+                        <p><%= matches[i].team1.name %> vs <%= matches[i].team2.name %> (<%= matches[i].format %>)</p>
+                        <p><%= matches[i].event.name %></p>
+                        <p> <a href="/scorebot?id=<%= matches[i].id %>"> Connect to Scorebot </a></p>
+                    </li>
+                    <% } %>
+                <% } %>
+            </ul>
+        <% } %>
+        <h3> UPCOMING MATCHES </h3>
         <ul>
             <% for(var i=0; i < matches.length; i++) { %>
-                <li><p><%= JSON.stringify(matches[i]) %></p></li>
+                <% if(matches[i].team1 && matches[i].team2 && matches[i].event && !matches[i].live){ %>
+                    <li>
+                    <p><%= matches[i].team1.name %> vs <%= matches[i].team2.name %> (<%= matches[i].format %>)</p>
+                    <p><%= matches[i].event.name %> </p>
+                    <p> <a href="/matchanalysis?id=<%= matches[i].id %>"> Analysis </a></p>
+                    </li>   
+                <% } else {%>
+                <% } %>
             <% } %>
-            </ul>
+        </ul>
     <% } %>
     <% if(error !== null){ %>
         <p><%= error %></p>
     <% } %>
-      
   </body>
 </html>
