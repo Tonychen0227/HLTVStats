@@ -36,26 +36,34 @@ app.get('/matches', function (req, res) {
         res.render('matches', {matches: null, error: 'Error, please try again'});
         console.log(err)
     });
-    console.log("requested matches"); 
 })
 
 app.get('/results', function (req, res) {
     HLTV.getMatchesStats({startDate: '2018-12-11', endDate: '2018-12-12'}).then((answer) => {
-        let matches = answer
-        if(matches == undefined){
-            res.render('results', {matches: null, error: 'Error, please try again'});
+        let results = answer
+        if(results == undefined){
+            res.render('results', {results: null, error: 'Error, please try again'});
         } else {
-            res.render('results', {matches: matches, error: null});
+            res.render('results', {results: matches, error: null});
         }
     }).catch(err => {
-        res.render('results', {matches: null, error: 'Error, please try again'});
+        res.render('results', {results: null, error: 'Error, please try again'});
         console.log(err)
     });
-    console.log("requested matches"); 
 })
 
 app.get('/results/detailedstats', function (req, res) {
-    res.render('detailedstats', {id: req.query.id, error: null});
+    HLTV.getMatchMapStats({id: req.query.id}).then((answer) => {
+        let results = answer
+        if(results == undefined){
+            res.render('detailedstats', {results: null, error: 'Error, please try again'});
+        } else {
+            res.render('detailedstats', {results: matches, error: null});
+        }
+    }).catch(err => {
+        res.render('detailedstats', {results: null, error: 'Error, please try again'});
+        console.log(err)
+    });
 })
 
 app.listen(3000, function () {

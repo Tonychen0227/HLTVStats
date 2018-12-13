@@ -8,20 +8,19 @@
   </head>
   <body>
       <fieldset>
-          <h1 align="center"> Match Stats </h1>
+          <h1 align="center"> Detailed Match Stats </h1>
           <div class="container">
               <form action="/" method="get">
                   <input type="submit" class="ghost-button" value="Back to Home">
               </form>
           </div>
-      </fieldset>
-      <h3> Match Stats </h3> 
-        <% if(id !== null){ %>
-            <p><%= id %></p>
-          <% } %>
-          <% if(error !== null){ %>
+          <% if(results !== null){ %>
+            <p> <%= JSON.stringify(matches) %> </p>>
+        <% } %>
+        <% if(error !== null){ %>
             <p><%= error %></p>
-          <% } %>
+        <% } %>
+      </fieldset>
     </div>
   </body>
 </html>

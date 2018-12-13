@@ -15,14 +15,14 @@
             </form>
         </div>
     <h3> MATCH RESULTS </h3>
-    <% if(matches !== null){ %>
+    <% if(results !== null){ %>
         <ul>
-            <% for(var i=0; i < matches.length; i++) { %>
-                <% if(matches[i].team1 && matches[i].team2 && matches[i].event && !matches[i].live){ %>
+            <% for(var i=0; i < results.length; i++) { %>
+                <% if(results[i].team1 && results[i].team2 && results[i].event && !results[i].live){ %>
                     <li>
-                    <p><%= matches[i].team1.name %> (<%= matches[i].result.team1 %>) vs <%= matches[i].team2.name %> (<%= matches[i].result.team2 %>) on <%= matches[i].map %> @ <%= matches[i].event.name %> </p>
-                    <p> <a href="results/detailedstats?id=<%= matches[i].id %>"> Detailed Stats </a></p>
-                    </li>   
+                    <p><%= results[i].team1.name %> (<%= results[i].result.team1 %>) vs <%= results[i].team2.name %> (<%= results[i].result.team2 %>) on <%= results[i].map %> @ <%= results[i].event.name %> </p>
+                    <p> <a href="results/detailedstats?id=<%= results[i].id %>"> Detailed Stats </a></p>
+                    </li>  
                 <% } else {%>
                 <% } %>
             <% } %>
