@@ -58,7 +58,7 @@ app.get('/results/detailedstats', function (req, res) {
         if(results == undefined){
             res.render('detailedstats', {results: null, error: 'Error, please try again'});
         } else {
-            res.render('detailedstats', {results: matches, error: null});
+            res.render('detailedstats', {results: results, error: null});
         }
     }).catch(err => {
         res.render('detailedstats', {results: null, error: 'Error, please try again'});
