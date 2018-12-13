@@ -40,7 +40,7 @@ app.get('/matches', function (req, res) {
 })
 
 app.get('/results', function (req, res) {
-    HLTV.getMatches().then((answer) => {
+    HLTV.getMatchesStats({startDate: '2018-12-11', endDate: '2018-12-12'}).then((answer) => {
         let matches = answer
         if(matches == undefined){
             res.render('results', {matches: null, error: 'Error, please try again'});
@@ -52,6 +52,10 @@ app.get('/results', function (req, res) {
         console.log(err)
     });
     console.log("requested matches"); 
+})
+
+app.get('/results/detailedstats', function (req, res) {
+    res.render('detailedstats', {id: req.query.id, error: null});
 })
 
 app.listen(3000, function () {
