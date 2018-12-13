@@ -44,7 +44,7 @@ app.get('/results', function (req, res) {
         if(results == undefined){
             res.render('results', {results: null, error: 'Error, please try again'});
         } else {
-            res.render('results', {results: matches, error: null});
+            res.render('results', {results: results, error: null});
         }
     }).catch(err => {
         res.render('results', {results: null, error: 'Error, please try again'});
