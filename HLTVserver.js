@@ -39,7 +39,18 @@ app.get('/matches', function (req, res) {
 })
 
 app.get('/results', function (req, res) {
-    HLTV.getMatchesStats({startDate: '2018-12-11', endDate: '2018-12-12'}).then((answer) => {
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth()+1; //January is 0!
+    var yyyy = today.getFullYear();
+    if(dd<10) {
+        dd = '0'+dd
+    } 
+    if(mm<10) {
+        mm = '0'+mm
+    } 
+    today = yyyy + '-' + mm + '-' + dd;
+    HLTV.getMatchesStats({startDate: '2018-12-11', endDate: today}).then((answer) => {
         let results = answer
         if(results == undefined){
             res.render('results', {results: null, error: 'Error, please try again'});
