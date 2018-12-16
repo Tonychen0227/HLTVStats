@@ -50,6 +50,8 @@ app.get('/results', function (req, res) {
         mm = '0'+mm
     } 
     today = yyyy + '-' + mm + '-' + dd;
+
+
     HLTV.getMatchesStats({startDate: '2018-12-11', endDate: today}).then((answer) => {
         let results = answer
         if(results == undefined){

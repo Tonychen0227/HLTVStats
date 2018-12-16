@@ -22,6 +22,15 @@
                     <% if(matches[i].live){ %>
                     <li>
                         <p><%= matches[i].team1.name %> vs <%= matches[i].team2.name %> (<%= matches[i].format %>)  @ <%= matches[i].event.name %> </p>
+                        <% if(matches[i].maps){ %>
+                            <p> <span> Maps: </span>
+                            <% for(var k=0; k < matches[i].maps.length; k++) { %>
+                                <span> <%= matches[i].maps[k] %> </span>
+                            <% } %>
+                            </p>
+                        <% } else {%>
+                            <p> No Maps Found </p>
+                        <% } %>
                         <p> <a href="matches/scorebot?id=<%= matches[i].id %>"> Connect to Scorebot </a></p>
                     </li>
                     <% } %>
@@ -34,13 +43,22 @@
                 <% if(matches[i].team1 && matches[i].team2 && matches[i].event && !matches[i].live){ %>
                     <li>
                     <p><%= matches[i].team1.name %> vs <%= matches[i].team2.name %> (<%= matches[i].format %>)  @ <%= matches[i].event.name %> </p>
+                    <% if(matches[i].maps){ %>
+                        <p> <span> Maps: </span>
+                        <% for(var k=0; k < matches[i].maps.length; k++) { %>
+                            <span> <%= matches[i].maps[k] %> </span>
+                        <% } %>
+                        </p>
+                    <% } else {%>
+                        <p> No Maps Found </p>
+                    <% } %>
                     <p> <a href="matches/matchanalysis?id=<%= matches[i].id %>"> Analysis </a></p>
                     </li>   
                 <% } else {%>
                 <% } %>
             <% } %>
+            <% } %>
         </ul>
-    <% } %>
     <% if(error !== null){ %>
         <p><%= error %></p>
     <% } %>
