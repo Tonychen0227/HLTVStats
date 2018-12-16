@@ -51,8 +51,59 @@ app.get('/results', function (req, res) {
     } 
     today = yyyy + '-' + mm + '-' + dd;
 
+    var onedayago = new Date();
+    onedayago.setDate(onedayago.getDate() - 3);
+    var dd = onedayago.getDate();
+    var mm = onedayago.getMonth()+1;
+    var yyyy = onedayago.getFullYear();
+    if(dd<10) {
+        dd = '0'+dd
+    } 
+    if(mm<10) {
+        mm = '0'+mm
+    } 
+    threedaysago = yyyy + '-' + mm + '-' + dd;
 
-    HLTV.getMatchesStats({startDate: '2018-12-11', endDate: today}).then((answer) => {
+    HLTV.getMatchesStats({startDate: onedayago, endDate: today}).then((answer) => {
+        let results = answer
+        if(results == undefined){
+            res.render('results', {results: null, error: 'Error, please try again'});
+        } else {
+            res.render('results', {results: results, error: null});
+        }
+    }).catch(err => {
+        res.render('results', {results: null, error: 'Error, please try again'});
+        console.log(err)
+    });
+})
+
+app.post('/results', function (req, res) {
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth()+1; //January is 0!
+    var yyyy = today.getFullYear();
+    if(dd<10) {
+        dd = '0'+dd
+    } 
+    if(mm<10) {
+        mm = '0'+mm
+    } 
+    today = yyyy + '-' + mm + '-' + dd;
+
+    var xdaysago = new Date();
+    xdaysago.setDate(xdaysago.getDate() - req.body.days);
+    var dd = xdaysago.getDate();
+    var mm = xdaysago.getMonth()+1;
+    var yyyy = xdaysago.getFullYear();
+    if(dd<10) {
+        dd = '0'+dd
+    } 
+    if(mm<10) {
+        mm = '0'+mm
+    } 
+    xdaysago = yyyy + '-' + mm + '-' + dd;
+
+    HLTV.getMatchesStats({startDate: xdaysago, endDate: today}).then((answer) => {
         let results = answer
         if(results == undefined){
             res.render('results', {results: null, error: 'Error, please try again'});

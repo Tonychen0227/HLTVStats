@@ -13,6 +13,16 @@
             <form action="/" method="get">
                 <input type="submit" class="ghost-button" value="Back to Home">
             </form>
+            <form action="/results" method="post">
+                <select id="days" name="days">
+                    <% var options = []; %>
+                        <option value="1" selected="selected">1 (Default)</option>
+                    <% for(var i = 2; i <= 10; i++) { %>
+                      <option value='<%= i %>'><%= i %></option>
+                    <% } %>
+                  </select>
+                <input type="submit" class="ghost-button" value="Query for Past X Days">
+            </form>
         </div>
     <h3> MATCH RESULTS </h3>
     <% if(results !== null){ %>
