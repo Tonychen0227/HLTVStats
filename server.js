@@ -10,6 +10,7 @@ HLTV.createInstance({hltvUrl: 'localhost', loadPage: https.get})
 
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
+app.use(express.static('images'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', function (req, res) {
@@ -119,6 +120,7 @@ app.post('/results', function (req, res) {
 app.get('/results/detailedstats', function (req, res) {
     HLTV.getMatchMapStats({id: req.query.id}).then((answer) => {
         let results = answer
+        console.log(results)
         if(results == undefined){
             res.render('detailedstats', {results: null, error: 'Error, please try again'});
         } else {

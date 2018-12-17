@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Test</title>
+    <title>Detailed Match Stats</title>
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
   </head>
@@ -89,17 +89,18 @@
             <% } %>
             <h5 align="center">
             <% for(var i = 0; i < 15; i++) { %>
-                <% if(results.roundHistory[0].outcome == "t_win"){ %>
-                    <span> <img class="roundIcon" src="images/TerroristKill.png"></img> </span>
-                <% }  else if (results.roundHistory[0].outcome == "ct_win"){ %>
-                    <span> <img class="roundIcon" src="images/CTerroristKill.png"></img> </span>
-                <% }  else if (results.roundHistory[0].outcome == "bomb_exploded") { %>
-                    <span> <img class="roundIcon" src="images/TerroristBomb.png"></img> </span>
+                <% if(results.roundHistory[i].outcome == "t_win"){ %>
+                    <span> <img class="roundIcon" src="../images/TerroristKill.png"></img> </span>
+                <% }  else if (results.roundHistory[i].outcome == "ct_win"){ %>
+                    <span> <img class="roundIcon" src="../images/CTerroristKill.png"></img> </span>
+                <% }  else if (results.roundHistory[i].outcome == "bomb_exploded") { %>
+                    <span> <img class="roundIcon" src="../images/TerroristBomb.png"></img> </span>
                 <% }  else { %>
-                    <span> <img class="roundIcon" src="images/CTerroristBomb.png"></img> </span>
+                    <span> <img class="roundIcon" src="../images/CTerroristBomb.png"></img> </span>
                 <% } %>
             <% } %>
             </h5>
+            <h5 align="center"> <%=results.team1.name%> <%= results.roundHistory[14].score %> <%=results.team2.name%></h5>
             <br>
             <h3 align="center"> Second Half Summary </h3>
             <% if(results.roundHistory[15].ctTeam == results.team1.id){ %>
@@ -108,18 +109,19 @@
                 <h4 align="center">Counter-Terrorists: <%= results.team2.name %> Terrorists: <%= results.team1.name %></h4>
             <% } %>
             <h5 align="center">
-                <% for(var i = 0; i < 15; i++) { %>
-                    <% if(results.roundHistory[0].outcome == "t_win"){ %>
-                        <span> <img class="roundIcon" src="images/TerroristKill.png"></img> </span>
-                    <% }  else if (results.roundHistory[0].outcome == "ct_win"){ %>
-                        <span> <img class="roundIcon" src="images/CTerroristKill.png"></img> </span>
-                    <% }  else if (results.roundHistory[0].outcome == "bomb_exploded") { %>
-                        <span> <img class="roundIcon" src="images/TerroristBomb.png"></img> </span>
+                <% for(var i = 15; i < results.roundHistory.length; i++) { %>
+                    <% if(results.roundHistory[i].outcome == "t_win"){ %>
+                        <span> <img class="roundIcon" src="../images/TerroristKill.png"></img> </span>
+                    <% }  else if (results.roundHistory[i].outcome == "ct_win"){ %>
+                        <span> <img class="roundIcon" src="../images/CTerroristKill.png"></img> </span>
+                    <% }  else if (results.roundHistory[i].outcome == "bomb_exploded") { %>
+                        <span> <img class="roundIcon" src="../images/TerroristBomb.png"></img> </span>
                     <% }  else { %>
-                        <span> <img class="roundIcon" src="images/CTerroristBomb.png"></img> </span>
+                        <span> <img class="roundIcon" src="../images/CTerroristBomb.png"></img> </span>
                     <% } %>
                 <% } %>
             </h5>
+            <h5 align="center"> <%=results.team1.name%> <%= results.roundHistory[results.roundHistory.length - 1].score %> <%=results.team2.name%></h5>
             <h6 align="center"> Disclaimer: no overtime summary available </h6>
         <% } %>
         <% if(error !== null){ %>
