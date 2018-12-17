@@ -120,7 +120,6 @@ app.post('/results', function (req, res) {
 app.get('/results/detailedstats', function (req, res) {
     HLTV.getMatchMapStats({id: req.query.id}).then((answer) => {
         let results = answer
-        console.log(results)
         if(results == undefined){
             res.render('detailedstats', {results: null, error: 'Error, please try again'});
         } else {
