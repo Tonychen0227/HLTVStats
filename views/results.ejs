@@ -13,8 +13,9 @@
             <form action="/" method="get">
                 <input type="submit" class="ghost-button" value="Back to Home">
             </form>
+            <br>
             <form action="/results" method="post">
-                <select id="days" name="days">
+                <select id="days" name="days" align="center">
                     <% var options = []; %>
                         <option value="1" selected="selected">1 (Default)</option>
                     <% for(var i = 2; i <= 10; i++) { %>
@@ -24,19 +25,29 @@
                 <input type="submit" class="ghost-button" value="Query for Past X Days">
             </form>
         </div>
-    <h3> MATCH RESULTS </h3>
+    <h3 align="center"> MATCH RESULTS </h3>
     <% if(results !== null){ %>
-        <ul>
+        <table>
+            <tr>
+                <th> Matchup </th>
+                <th width="250px"> Tournament </th>
+                <th> Map </th>
+                <th width="60px"> Score </th>
+                <th> Details </th>
+            </tr>
             <% for(var i=0; i < results.length; i++) { %>
                 <% if(results[i].team1 && results[i].team2 && results[i].event && !results[i].live){ %>
-                    <li>
-                    <p><%= results[i].team1.name %> (<%= results[i].result.team1 %>) vs <%= results[i].team2.name %> (<%= results[i].result.team2 %>) on <%= results[i].map %> @ <%= results[i].event.name %> </p>
-                    <p> <a href="results/detailedstats?id=<%= results[i].id %>"> Detailed Stats </a></p>
-                    </li>  
+                    <tr>
+                        <td><%= results[i].team1.name %> vs <%= results[i].team2.name %></td>
+                        <td width="250px"><%= results[i].event.name %></td>
+                        <td><%= results[i].map %></td>
+                        <td width="75px"><%= results[i].result.team1 %>-<%= results[i].result.team2 %></td>
+                        <td><a href="results/detailedstats?id=<%= results[i].id %>"> Details </a></td>
+                    </tr>
                 <% } else {%>
                 <% } %>
             <% } %>
-        </ul>
+        </table>
     <% } %>
     <% if(error !== null){ %>
         <p><%= error %></p>
