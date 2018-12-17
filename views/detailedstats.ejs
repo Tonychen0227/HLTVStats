@@ -13,9 +13,114 @@
               <form action="/" method="get">
                   <input type="submit" class="ghost-button" value="Back to Home">
               </form>
+              <br>
+              <form action="/results" method="get">
+                <input type="submit" class="ghost-button" value="Back to Results">
+            </form>
           </div>
           <% if(results !== null){ %>
-            <p> <%= JSON.stringify(results) %> </p>>
+            <h3 align="center"> Match Overview </h3>
+            <table>
+                <tr>
+                    <th>Team</th>
+                    <th>Rating</th> 
+                    <th>First Kills</th>
+                    <th>Clutches Won</th>
+                </tr>
+                <tr>
+                    <td align="center"><%= results.team1.name %></td>
+                    <td align="center"><%= results.overview.rating.team1 %></td> 
+                    <td align="center"> <%= results.overview.firstKills.team1 %></td>
+                    <td align="center"><%= results.overview.clutchesWon.team1 %></td>
+                </tr>
+                <tr>
+                    <td align="center"><%= results.team2.name %></td>
+                    <td align="center"><%= results.overview.rating.team2 %></td> 
+                    <td align="center"><%= results.overview.firstKills.team2 %></td>
+                    <td align="center"><%= results.overview.clutchesWon.team2 %></td>
+                </tr>
+            </table>
+            <br>
+            <h3 align="center"> <%= results.team1.name %> Player Stats </h3>
+            <table>
+                    <tr>
+                        <th>Player</th>
+                        <th>Kills</th> 
+                        <th>Deaths</th>
+                        <th>ADR</th>
+                        <th>Rating</th>
+                    </tr>
+                    <% for(var i = 0; i < results.playerStats.team1.length; i++) { %>
+                        <tr>
+                            <td align="center"><%= results.playerStats.team1[i].name %></td>
+                            <td align="center"><%= results.playerStats.team1[i].kills %></td>
+                            <td align="center"><%= results.playerStats.team1[i].deaths %></td>
+                            <td align="center"><%= results.playerStats.team1[i].ADR %></td>
+                            <td align="center"><%= results.playerStats.team1[i].rating %></td>
+                        </tr>
+                    <% } %>
+            </table>
+            <br>
+            <h3 align="center"> <%= results.team2.name %> Player Stats </h3>
+            <table>
+                    <tr>
+                        <th>Player</th>
+                        <th>Kills</th> 
+                        <th>Deaths</th>
+                        <th>ADR</th>
+                        <th>Rating</th>
+                    </tr>
+                    <% for(var i = 0; i < results.playerStats.team2.length; i++) { %>
+                        <tr>
+                            <td align="center"><%= results.playerStats.team2[i].name %></td>
+                            <td align="center"><%= results.playerStats.team2[i].kills %></td>
+                            <td align="center"><%= results.playerStats.team2[i].deaths %></td>
+                            <td align="center"><%= results.playerStats.team2[i].ADR %></td>
+                            <td align="center"><%= results.playerStats.team2[i].rating %></td>
+                        </tr>
+                    <% } %>
+            </table>
+            <br>
+            <h3 align="center"> First Half Summary </h3>
+            <% if(results.roundHistory[0].ctTeam == results.team1.id){ %>
+                <h4 align="center">Counter-Terrorists: <%= results.team1.name %> Terrorists: <%= results.team2.name %></h4>
+            <% }  else { %>
+                <h4 align="center">Counter-Terrorists: <%= results.team2.name %> Terrorists: <%= results.team1.name %></h4>
+            <% } %>
+            <h5 align="center">
+            <% for(var i = 0; i < 15; i++) { %>
+                <% if(results.roundHistory[0].outcome == "t_win"){ %>
+                    <span> <img class="roundIcon" src="images/TerroristKill.png"></img> </span>
+                <% }  else if (results.roundHistory[0].outcome == "ct_win"){ %>
+                    <span> <img class="roundIcon" src="images/CTerroristKill.png"></img> </span>
+                <% }  else if (results.roundHistory[0].outcome == "bomb_exploded") { %>
+                    <span> <img class="roundIcon" src="images/TerroristBomb.png"></img> </span>
+                <% }  else { %>
+                    <span> <img class="roundIcon" src="images/CTerroristBomb.png"></img> </span>
+                <% } %>
+            <% } %>
+            </h5>
+            <br>
+            <h3 align="center"> Second Half Summary </h3>
+            <% if(results.roundHistory[15].ctTeam == results.team1.id){ %>
+                <h4 align="center">Counter-Terrorists: <%= results.team1.name %> Terrorists: <%= results.team2.name %></h4>
+            <% }  else { %>
+                <h4 align="center">Counter-Terrorists: <%= results.team2.name %> Terrorists: <%= results.team1.name %></h4>
+            <% } %>
+            <h5 align="center">
+                <% for(var i = 0; i < 15; i++) { %>
+                    <% if(results.roundHistory[0].outcome == "t_win"){ %>
+                        <span> <img class="roundIcon" src="images/TerroristKill.png"></img> </span>
+                    <% }  else if (results.roundHistory[0].outcome == "ct_win"){ %>
+                        <span> <img class="roundIcon" src="images/CTerroristKill.png"></img> </span>
+                    <% }  else if (results.roundHistory[0].outcome == "bomb_exploded") { %>
+                        <span> <img class="roundIcon" src="images/TerroristBomb.png"></img> </span>
+                    <% }  else { %>
+                        <span> <img class="roundIcon" src="images/CTerroristBomb.png"></img> </span>
+                    <% } %>
+                <% } %>
+            </h5>
+            <h6 align="center"> Disclaimer: no overtime summary available </h6>
         <% } %>
         <% if(error !== null){ %>
             <p><%= error %></p>

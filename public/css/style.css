@@ -72,3 +72,14 @@ body {
   p {
     color: #a711b2;
   }
+
+  table{
+    width:70%; 
+    margin-left:12.5%; 
+    margin-right:12.5%;
+  }
+
+  .roundIcon{
+    height: 25px;
+    width: 25px;
+  }
