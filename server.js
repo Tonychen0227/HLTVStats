@@ -131,7 +131,23 @@ app.post('/results', function (req, res) {
 
 app.get('/results/detailedstats', function (req, res) {
     HLTV.getMatchMapStats({id: req.query.id}).then((answer) => {
-        let results = answer
+        let results = answer;
+        let currentHistory = results.roundHistory;
+        let newHistory = [];
+        let total_filled = 1;
+        for (i = 0; i < currentHistory.length; i++) {
+            let pieces = currentHistory[i].score.split("-");
+            let sum = parseInt(pieces[0]) + parseInt(pieces[1]);
+            console.log(sum, i + 1, pieces)
+            for (k = sum; k > i + total_filled; k--) {
+                newHistory.push({outcome: "time_out", score: (parseInt(pieces[0]) - 1).toString() + "-" + pieces[1]});
+                pieces[0] = (parseInt(pieces[0]) - 1).toString();
+                total_filled = total_filled + 1;
+            }
+            newHistory.push(currentHistory[i]);
+        }
+        console.log(newHistory);
+        results.roundHistory = newHistory;
         if(results == undefined){
             res.render('detailedstats', {results: null, error: 'Error, please try again'});
         } else {

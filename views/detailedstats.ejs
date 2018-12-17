@@ -95,8 +95,10 @@
                     <span> <img class="roundIcon" src="../images/CTerroristKill.png"></img> </span>
                 <% }  else if (results.roundHistory[i].outcome == "bomb_exploded") { %>
                     <span> <img class="roundIcon" src="../images/TerroristBomb.png"></img> </span>
-                <% }  else { %>
+                <% }  else if (results.roundHistory[i].outcome == "bomb_defused") { %>
                     <span> <img class="roundIcon" src="../images/CTerroristBomb.png"></img> </span>
+                <% }  else { %>
+                    <span> <img class="roundIcon" src="../images/Timeout.png"></img> </span>
                 <% } %>
             <% } %>
             </h5>
@@ -121,7 +123,6 @@
                 <% } %>
             </h5>
             <h5 align="center"> <%=results.team1.name%> <%= results.roundHistory[results.roundHistory.length - 1].score %> <%=results.team2.name%></h5>
-            <h6 align="center"> Disclaimer: timeouts are not displayed </h6>
             <h6 align="center"> Disclaimer: no overtime summary available </h6>
         <% } %>
         <% if(error !== null){ %>
