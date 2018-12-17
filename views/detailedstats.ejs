@@ -83,9 +83,9 @@
             <br>
             <h3 align="center"> First Half Summary </h3>
             <% if(results.roundHistory[0].ctTeam == results.team1.id){ %>
-                <h4 align="center">Counter-Terrorists: <%= results.team1.name %> Terrorists: <%= results.team2.name %></h4>
+                <h5 align="center">Counter-Terrorists: <%= results.team1.name %> </h5> <h5 align="center"> Terrorists: <%= results.team2.name %></h5>
             <% }  else { %>
-                <h4 align="center">Counter-Terrorists: <%= results.team2.name %> Terrorists: <%= results.team1.name %></h4>
+                <h5 align="center">Counter-Terrorists: <%= results.team2.name %> </h5> <h5 align="center"> Terrorists: <%= results.team1.name %></h5>
             <% } %>
             <h5 align="center">
             <% for(var i = 0; i < 15; i++) { %>
@@ -104,9 +104,9 @@
             <br>
             <h3 align="center"> Second Half Summary </h3>
             <% if(results.roundHistory[15].ctTeam == results.team1.id){ %>
-                <h4 align="center">Counter-Terrorists: <%= results.team1.name %> Terrorists: <%= results.team2.name %></h4>
+                <h5 align="center">Counter-Terrorists: <%= results.team1.name %> </h5> <h5 align="center"> Terrorists: <%= results.team2.name %></h5>
             <% }  else { %>
-                <h4 align="center">Counter-Terrorists: <%= results.team2.name %> Terrorists: <%= results.team1.name %></h4>
+                <h5 align="center">Counter-Terrorists: <%= results.team2.name %> </h5> <h5 align="center"> Terrorists: <%= results.team1.name %></h5>
             <% } %>
             <h5 align="center">
                 <% for(var i = 15; i < results.roundHistory.length; i++) { %>
