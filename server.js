@@ -52,7 +52,7 @@ app.get('/results', function (req, res) {
     today = yyyy + '-' + mm + '-' + dd;
 
     var onedayago = new Date();
-    onedayago.setDate(onedayago.getDate() - 3);
+    onedayago.setDate(onedayago.getDate() - 1);
     var dd = onedayago.getDate();
     var mm = onedayago.getMonth()+1;
     var yyyy = onedayago.getFullYear();
@@ -62,7 +62,7 @@ app.get('/results', function (req, res) {
     if(mm<10) {
         mm = '0'+mm
     } 
-    threedaysago = yyyy + '-' + mm + '-' + dd;
+    onedayago = yyyy + '-' + mm + '-' + dd;
 
     HLTV.getMatchesStats({startDate: onedayago, endDate: today}).then((answer) => {
         let results = answer
