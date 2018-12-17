@@ -95,6 +95,12 @@ body {
   }
 
   select {
-    display: block;
     margin: 0 auto;
   }
+.fields {
+  white-space:nowrap;
+}
+
+input {
+  width: 100px;
+}

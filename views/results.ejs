@@ -15,14 +15,23 @@
             </form>
             <br>
             <form action="/results" method="post">
-                <select id="days" name="days" align="center">
-                    <% var options = []; %>
-                        <option value="1" selected="selected">1 (Default)</option>
-                    <% for(var i = 2; i <= 10; i++) { %>
-                      <option value='<%= i %>'><%= i %></option>
-                    <% } %>
-                  </select>
-                <input type="submit" class="ghost-button" value="Query for Past X Days">
+                <div class="fields" align="center">
+                    <label for="days"> How many days? </label>
+                    <select id="days" name="days" align="center">
+                        <% var options = []; %>
+                        <option value="1" selected="selected">1 day (Default)</option>
+                        <% for(var i = 2; i <= 10; i++) { %>
+                            <option value='<%= i %>'><%= i %> days </option>
+                        <% } %>
+                    </select>
+                </div>
+                <div class="fields" align="center">
+                    <label for="teamname"> Filter by team: </label>
+                    <input type="teamname" name="teamname">
+                    <label for="eventname"> Filter by event: </label>
+                    <input type="eventname" name="eventname">
+                </div>
+                <input type="submit" class="ghost-button" value="Filter">
             </form>
         </div>
     <h3 align="center"> MATCH RESULTS </h3>
