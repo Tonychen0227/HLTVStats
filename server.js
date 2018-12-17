@@ -18,7 +18,19 @@ app.get('/', function (req, res) {
 })
 
 app.get('/matches/scorebot', function (req, res) {
-    res.render('scorebot', {id: req.query.id, error: null});
+    HLTV.getMatch({id: req.query.id}).then(res => {
+        let match = res
+        res.render('scorebot', {match: match, error: null})
+    }).catch(err => {
+        res.render('scorebot', {match: null, error: 'Error, please try again'})
+    })
+    /*
+    HLTV.connectToScorebot({id: req.query.id, onScoreboardUpdate: (data) => {
+
+    }, onLogUpdate: (data) => {
+
+    }
+    */
 })
 
 app.get('/matches/matchanalysis', function (req, res) {
