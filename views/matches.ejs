@@ -36,7 +36,7 @@
                         <th>Format</th>
                         <th>Tournament</th>
                         <th>Maps</th>
-                        <th>Analysis/Scorebot</th>
+                        <th>Scorebot</th>
                     </tr>
                     <% for(var i=0; i < matches.length; i++) { %>
                         <% if(matches[i].live){ %>
@@ -63,6 +63,7 @@
         <h3 align="center"> UPCOMING MATCHES </h3>
         <table>
             <tr>
+                <th>Date</th>
                 <th>Matchup</th>
                 <th>Format</th>
                 <th>Tournament</th>
@@ -72,6 +73,7 @@
             <% for(var i=0; i < matches.length; i++) { %>
                 <% if(matches[i].team1 && matches[i].team2 && matches[i].event && !matches[i].live){ %>
                     <tr>
+                        <td><%= 1900 + new Date(matches[i].date).getYear() %>-<%= 1 + new Date(matches[i].date).getMonth() %>-<%= new Date(matches[i].date).getDate() %></td>
                         <td><%= matches[i].team1.name %> vs <%= matches[i].team2.name %></td>
                         <td><%= matches[i].format %></td>
                         <td><%= matches[i].event.name %></td>
