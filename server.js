@@ -17,29 +17,38 @@ app.get('/', function (req, res) {
     res.render('landing');
 })
 
-app.post('/matches/scorebot', function (req, res) {
-    if (!req.query.matches || req.query.matches.length == 0) {
-        res.render('scorebot', {matches: null, error: 'Error, please select matches'});
-    } else if (!req.query.matches || req.query.matches.length >= 4) {
-        res.render('scorebot', {matches: null, error: 'Error, please select no more than 4 matches'});
-    } else {
-        let matches = [];
-        for (i = 0; i < req.query.matches.length; i++) {
-            HLTV.getMatch({id: req.query.matches[i]}).then(match => {
-                matches.append(match);
-            }).catch(err => {
-                console.log(err);
-            })
+app.get('/matches/scorebot', function (req, res) {
+    HLTV.getMatch({id: req.query.id}).then(match => {
+        /*
+        if (match.hasScorebot) {
+            let recentUpdate;
+            let recentLog = [];
+            HLTV.connectToScorebot({id: req.query.id, onScoreboardUpdate: (data) => {
+                recentUpdate = data;
+                try {
+                    res.render('scorebot', {match: match, update: recentUpdate, log: recentLog, error: null});
+                } catch (err) {
+                    res.redirect(res.render('scorebot', {match: match, update: recentUpdate, log: recentLog, error: null}));
+                }
+            }, onLogUpdate: (data) => {
+                recentLog.push(data);
+                if (recentLog.length > 5) {
+                    recentLog.shift();
+                } try {
+                    res.render('scorebot', {match: match, update: recentUpdate, log: recentLog, error: null});
+                } catch (err) {
+                    res.redirect(res.render('scorebot', {match: match, update: log, log: recentLog, error: null}));
+                }
+            }})
+        } else {
+            res.render('scorebot', {match: match, update: null, log: null, error: 'No scorebot found'});
         }
-        res.render('scorebot', {matches: matches, error: null});
-    }
-    /*
-    HLTV.connectToScorebot({id: req.query.id, onScoreboardUpdate: (data) => {
-
-    }, onLogUpdate: (data) => {
-
-    }
-    */
+        */
+       res.render('scorebot', {match: match, update: null, log: null, error: 'No scorebot found'});
+    }).catch(err => {
+        res.render('scorebot', {match: null, update: null, log: null, error: 'Error, please try again'});
+    })
+    
 })
 
 app.get('/matches/matchanalysis', function (req, res) {
