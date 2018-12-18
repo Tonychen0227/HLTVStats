@@ -25,7 +25,7 @@
             </form>
         </div>
     <% if(matches !== null){ %>
-        <% if(matches[0].live){ %>
+        <% if(matches.length > 0 && matches[0].live){ %>
             <h3 align="center"> LIVE MATCHES </h3>
             <br>
                 <table>
