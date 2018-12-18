@@ -91,7 +91,7 @@ app.post('/matches', function (req, res) {
     HLTV.getMatches().then((answer) => {
         let matches = answer
         if(matches == undefined){
-            res.render('matches', {matches: null, error: 'Error, please try again'});
+            res.render('matches', {matches: null, error: 'Error, please try again', team: teamParam, event: eventParam});
         } else {
             let output = [];
             for (i = 0; i < matches.length; i++) {
@@ -116,10 +116,10 @@ app.post('/matches', function (req, res) {
             if (teamParam != "" || eventParam != "") {
                 matches = output;
             }
-            res.render('matches', {matches: matches, error: null});
+            res.render('matches', {matches: matches, error: null, team: teamParam, event: eventParam});
         }
     }).catch(err => {
-        res.render('matches', {matches: null, error: 'Error, please try again'});
+        res.render('matches', {matches: null, error: 'Error, please try again', team: teamParam, event: eventParam});
         console.log(err)
     });
 })
@@ -160,7 +160,7 @@ app.post('/results', function (req, res) {
     HLTV.getMatchesStats({startDate: xdaysago, endDate: today}).then((answer) => {
         let results = answer
         if(results == undefined){
-            res.render('results', {results: null, error: 'Error, please try again'});
+            res.render('results', {results: null, error: 'Error, please try again', team: teamParam, event: eventParam});
         } else {
             let output = [];
             for (i = 0; i < results.length; i++) {
@@ -176,10 +176,10 @@ app.post('/results', function (req, res) {
             if (teamParam != "" || eventParam != "") {
                 results = output;
             }
-            res.render('results', {results: results, error: null});
+            res.render('results', {results: results, error: null, team: teamParam, event: eventParam});
         }
     }).catch(err => {
-        res.render('results', {results: null, error: 'Error, please try again'});
+        res.render('results', {results: null, error: 'Error, please try again', team: teamParam, event: eventParam});
         console.log(err)
     });
 })
