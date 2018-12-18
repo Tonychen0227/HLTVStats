@@ -18,10 +18,11 @@
                     <input type="submit" class="ghost-button" value="Back to Matches">
               </form>
           </div>
-      <h3 align="center"> Live Scores </h3> 
+      
         <% if(match !== null){ %>
           <h3 align="center"> <%=match.team1.name%> vs <%=match.team2.name%> </h3>
-          <h3 align="center"> Maps:
+          <h4 align="center"> <%= match.event %> </h4> 
+          <h4 align="center"> Maps:
           <% for(var i=0; i < match.maps.length; i++) { %>
             <% if(match.maps[i].statsId){ %>
               <a href="../results/detailedstats?id=<%=match.maps[i].statsId%>"><span> <%=match.maps[i].name%></span></a>
@@ -35,8 +36,9 @@
               <% } %>
             <% } %>
           <% } %>
+          </h4>
           <% if(match.additionalInfo.trim() != ""){ %>
-            <h3 align="center"> <%=match.additionalInfo%> </h3>
+            <h5 align="center"> <%=match.additionalInfo%> </h5>
           <% } %>
         <% } else { %>
           <p> No match found </p>
