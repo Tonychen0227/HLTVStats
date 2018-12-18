@@ -24,9 +24,15 @@
           <h3 align="center"> Maps:
           <% for(var i=0; i < match.maps.length; i++) { %>
             <% if(match.maps[i].statsId){ %>
-              <a href="../results/detailedstats?id=<%=match.maps[i].statsId%>"><span> <%=match.maps[i].name%></span></a><span> (<%= match.maps[i].result.substring(0, 5).trim()%>) </span></a>
+              <a href="../results/detailedstats?id=<%=match.maps[i].statsId%>"><span> <%=match.maps[i].name%></span></a>
             <% } else { %>
-              <span> <%=match.maps[i].name%> (<%= match.maps[i].result.substring(0, 5).trim()%>) </span>
+              <span> <%=match.maps[i].name%></span>
+            <% } %>
+            <% for(var k=0; k < match.maps[i].result.length; k++) { %>
+              <% if(match.maps[i].result[k] == ' '){ %>
+                <span> (<%= match.maps[i].result.substring(0, k).trim()%>) </span>
+                <% break; %>
+              <% } %>
             <% } %>
           <% } %>
           <% if(match.additionalInfo.trim() != ""){ %>
