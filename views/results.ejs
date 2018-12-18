@@ -48,7 +48,7 @@
             <% for(var i=0; i < results.length; i++) { %>
                 <% if(results[i].team1 && results[i].team2 && results[i].event && !results[i].live){ %>
                     <tr>
-                        <td><%= 1900 + new Date(matches[i].date).getYear() %>-<%= 1 + new Date(matches[i].date).getMonth() %>-<%= new Date(matches[i].date).getDate() %></td>
+                        <td><%= 1900 + new Date(results[i].date).getYear() %>-<%= 1 + new Date(results[i].date).getMonth() %>-<%= new Date(results[i].date).getDate() %></td>
                         <td><%= results[i].team1.name %> vs <%= results[i].team2.name %></td>
                         <td width="250px"><%= results[i].event.name %></td>
                         <td><%= results[i].map %></td>
