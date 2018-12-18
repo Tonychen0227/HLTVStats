@@ -52,6 +52,45 @@ app.get('/matches', function (req, res) {
     });
 })
 
+app.post('/matches', function (req, res) {
+    HLTV.getMatches().then((answer) => {
+        let matches = answer
+        if(matches == undefined){
+            res.render('matches', {matches: null, error: 'Error, please try again'});
+        } else {
+            let teamParam = req.body.teamname.toUpperCase() || "";
+            let eventParam = req.body.eventname.toUpperCase() || "";
+            let output = [];
+            for (i = 0; i < matches.length; i++) {
+                let team1 = "";
+                let team2 = "";
+                let event = "";
+                if (matches[i].team1) {
+                    team1 = matches[i].team1.name.toUpperCase() || "";
+                }
+                if (matches[i].team2) {
+                    team1 = matches[i].team1.name.toUpperCase() || "";
+                }
+                if (matches[i].event) {
+                    event = matches[i].event.name.toUpperCase() || "";
+                }
+                if (((team1.indexOf(teamParam) != -1 || 
+                team2.indexOf(teamParam) != -1) && teamParam != "")||
+                (event.indexOf(eventParam) != -1 && eventParam != "")) {
+                    output.push(matches[i]);
+                }
+            }
+            if (teamParam != "" || eventParam != "") {
+                matches = output;
+            }
+            res.render('matches', {matches: matches, error: null});
+        }
+    }).catch(err => {
+        res.render('matches', {matches: null, error: 'Error, please try again'});
+        console.log(err)
+    });
+})
+
 app.get('/results', function (req, res) {
     var today = new Date();
     var dd = today.getDate();
@@ -122,6 +161,22 @@ app.post('/results', function (req, res) {
         if(results == undefined){
             res.render('results', {results: null, error: 'Error, please try again'});
         } else {
+            let teamParam = req.body.teamname.toUpperCase() || "";
+            let eventParam = req.body.eventname.toUpperCase() || "";
+            let output = [];
+            for (i = 0; i < results.length; i++) {
+                let team1 = results[i].team1.name.toUpperCase();
+                let team2 = results[i].team2.name.toUpperCase();
+                let event = results[i].event.name.toUpperCase();
+                if (((team1.indexOf(teamParam) != -1 || 
+                team2.indexOf(teamParam) != -1) && teamParam != "")||
+                (event.indexOf(eventParam) != -1 && eventParam != "")) {
+                    output.push(results[i]);
+                }
+            }
+            if (teamParam != "" || eventParam != "") {
+                results = output;
+            }
             res.render('results', {results: results, error: null});
         }
     }).catch(err => {
