@@ -27,7 +27,7 @@ app.get('/', function (req, res) {
     today = yyyy + '-' + mm + '-' + dd;
 
     var onemonthago = new Date();
-    onemonthago.setDate(oneweekago.getDate() - 30);
+    onemonthago.setDate(onemonthago.getDate() - 30);
     var dd = onemonthago.getDate();
     var mm = onemonthago.getMonth()+1;
     var yyyy = onemonthago.getFullYear();
