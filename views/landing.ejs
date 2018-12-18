@@ -41,6 +41,23 @@
                 <input type="submit" class="ghost-button" value="Find Results">
             </form>
         </div>
+        <% if (rankings != null) { %>
+            <h3 align="center"> Best Players This Week </h3>
+            <table>
+                <tr>
+                    <th>Rank</th>
+                    <th>Player</th>
+                    <th>Rating</th>
+                </tr>
+                <% for(var i = 0; i < 20; i++) { %>
+                    <tr>
+                        <td><%= i + 1 %></td>
+                        <td><%= rankings[i].name %></td>
+                        <td><%= rankings[i].rating %></td>
+                    </tr>
+                <% } %>
+            </table>
+        <% } %>
     </fieldset>
 </body>
 </html>

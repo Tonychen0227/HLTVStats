@@ -14,7 +14,33 @@ app.use(express.static('images'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', function (req, res) {
-    res.render('landing');
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth()+1; //January is 0!
+    var yyyy = today.getFullYear();
+    if(dd<10) {
+        dd = '0'+dd
+    } 
+    if(mm<10) {
+        mm = '0'+mm
+    } 
+    today = yyyy + '-' + mm + '-' + dd;
+
+    var oneweekago = new Date();
+    oneweekago.setDate(oneweekago.getDate() - 7);
+    var dd = oneweekago.getDate();
+    var mm = oneweekago.getMonth()+1;
+    var yyyy = oneweekago.getFullYear();
+    if(dd<10) {
+        dd = '0'+dd
+    } 
+    if(mm<10) {
+        mm = '0'+mm
+    } 
+    oneweekago = yyyy + '-' + mm + '-' + dd;
+    HLTV.getPlayerRanking({startDate: oneweekago, endDate: today}).then(answer => {
+        res.render('landing', {rankings: answer})
+    })
 })
 
 app.get('/matches/scorebot', function (req, res) {
@@ -55,28 +81,18 @@ app.get('/matches/matchanalysis', function (req, res) {
     res.render('matchanalysis', {id: req.query.id, error: null});
 })
 
-app.get('/matches', function (req, res) {
-    HLTV.getMatches().then((answer) => {
-        let matches = answer
-        if(matches == undefined){
-            res.render('matches', {matches: null, error: 'Error, please try again'});
-        } else {
-            res.render('matches', {matches: matches, error: null});
-        }
-    }).catch(err => {
-        res.render('matches', {matches: null, error: 'Error, please try again'});
-        console.log(err)
-    });
-})
-
 app.post('/matches', function (req, res) {
+    let teamParam = req.body.teamname || "";
+    let eventParam = req.body.eventname || "";
+
+    teamParam = teamParam.toUpperCase();
+    eventParam = eventParam.toUpperCase();
+
     HLTV.getMatches().then((answer) => {
         let matches = answer
         if(matches == undefined){
             res.render('matches', {matches: null, error: 'Error, please try again'});
         } else {
-            let teamParam = req.body.teamname.toUpperCase() || "";
-            let eventParam = req.body.eventname.toUpperCase() || "";
             let output = [];
             for (i = 0; i < matches.length; i++) {
                 let team1 = "";
@@ -86,7 +102,7 @@ app.post('/matches', function (req, res) {
                     team1 = matches[i].team1.name.toUpperCase() || "";
                 }
                 if (matches[i].team2) {
-                    team1 = matches[i].team1.name.toUpperCase() || "";
+                    team2 = matches[i].team2.name.toUpperCase() || "";
                 }
                 if (matches[i].event) {
                     event = matches[i].event.name.toUpperCase() || "";
@@ -108,46 +124,14 @@ app.post('/matches', function (req, res) {
     });
 })
 
-app.get('/results', function (req, res) {
-    var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth()+1; //January is 0!
-    var yyyy = today.getFullYear();
-    if(dd<10) {
-        dd = '0'+dd
-    } 
-    if(mm<10) {
-        mm = '0'+mm
-    } 
-    today = yyyy + '-' + mm + '-' + dd;
-
-    var onedayago = new Date();
-    onedayago.setDate(onedayago.getDate() - 1);
-    var dd = onedayago.getDate();
-    var mm = onedayago.getMonth()+1;
-    var yyyy = onedayago.getFullYear();
-    if(dd<10) {
-        dd = '0'+dd
-    } 
-    if(mm<10) {
-        mm = '0'+mm
-    } 
-    onedayago = yyyy + '-' + mm + '-' + dd;
-
-    HLTV.getMatchesStats({startDate: onedayago, endDate: today}).then((answer) => {
-        let results = answer
-        if(results == undefined){
-            res.render('results', {results: null, error: 'Error, please try again'});
-        } else {
-            res.render('results', {results: results, error: null});
-        }
-    }).catch(err => {
-        res.render('results', {results: null, error: 'Error, please try again'});
-        console.log(err)
-    });
-})
-
 app.post('/results', function (req, res) {
+    let teamParam = req.body.teamname || "";
+    let daysParam = req.body.days || 1;
+    let eventParam = req.body.eventname || "";
+
+    teamParam = teamParam.toUpperCase();
+    eventParam = eventParam.toUpperCase();
+
     var today = new Date();
     var dd = today.getDate();
     var mm = today.getMonth()+1; //January is 0!
@@ -160,8 +144,8 @@ app.post('/results', function (req, res) {
     } 
     today = yyyy + '-' + mm + '-' + dd;
 
-    var xdaysago = new Date();
-    xdaysago.setDate(xdaysago.getDate() - req.body.days);
+    let xdaysago = new Date();
+    xdaysago.setDate(xdaysago.getDate() - daysParam + 1);
     var dd = xdaysago.getDate();
     var mm = xdaysago.getMonth()+1;
     var yyyy = xdaysago.getFullYear();
@@ -178,8 +162,6 @@ app.post('/results', function (req, res) {
         if(results == undefined){
             res.render('results', {results: null, error: 'Error, please try again'});
         } else {
-            let teamParam = req.body.teamname.toUpperCase() || "";
-            let eventParam = req.body.eventname.toUpperCase() || "";
             let output = [];
             for (i = 0; i < results.length; i++) {
                 let team1 = results[i].team1.name.toUpperCase();
