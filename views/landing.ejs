@@ -42,14 +42,14 @@
             </form>
         </div>
         <% if (rankings != null) { %>
-            <h3 align="center"> Best Players This Week </h3>
+            <h3 align="center"> Best Players This Month </h3>
             <table>
                 <tr>
                     <th>Rank</th>
                     <th>Player</th>
                     <th>Rating</th>
                 </tr>
-                <% for(var i = 0; i < 20; i++) { %>
+                <% for(var i = 0; i < 30; i++) { %>
                     <tr>
                         <td><%= i + 1 %></td>
                         <td><%= rankings[i].name %></td>

@@ -26,19 +26,19 @@ app.get('/', function (req, res) {
     } 
     today = yyyy + '-' + mm + '-' + dd;
 
-    var oneweekago = new Date();
-    oneweekago.setDate(oneweekago.getDate() - 7);
-    var dd = oneweekago.getDate();
-    var mm = oneweekago.getMonth()+1;
-    var yyyy = oneweekago.getFullYear();
+    var onemonthago = new Date();
+    onemonthago.setDate(oneweekago.getDate() - 30);
+    var dd = onemonthago.getDate();
+    var mm = onemonthago.getMonth()+1;
+    var yyyy = onemonthago.getFullYear();
     if(dd<10) {
         dd = '0'+dd
     } 
     if(mm<10) {
         mm = '0'+mm
     } 
-    oneweekago = yyyy + '-' + mm + '-' + dd;
-    HLTV.getPlayerRanking({startDate: oneweekago, endDate: today}).then(answer => {
+    onemonthago = yyyy + '-' + mm + '-' + dd;
+    HLTV.getPlayerRanking({startDate: onemonthago, endDate: today}).then(answer => {
         res.render('landing', {rankings: answer})
     })
 })
