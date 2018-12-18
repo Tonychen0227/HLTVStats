@@ -19,12 +19,16 @@
             </form>
           </div>
       <h3 align="center"> Live Scores </h3> 
-        <% if(match !== null){ %>
-            <p><%= JSON.stringify(match) %></p>
+        <% if(matches !== null){ %>
+          <% for(var i=0; i < matches.length; i++) { %>
+            <p><%= JSON.stringify(matches[i]) %></p>
           <% } %>
-          <% if(error !== null){ %>
-            <p><%= error %></p>
-          <% } %>
+        <% } else { %>
+          <p> No results yet </p>
+        <% } %>
+        <% if(error !== null){ %>
+          <p><%= error %></p>
+        <% } %>
       </fieldset>
   </body>
 </html>

@@ -17,14 +17,22 @@ app.get('/', function (req, res) {
     res.render('landing');
 })
 
-app.get('/matches/scorebot', function (req, res) {
-    HLTV.getMatch({id: req.query.id}).then(answer => {
-        let match = answer
-        res.render('scorebot', {match: match, error: null})
-    }).catch(err => {
-        console.log(err)
-        res.render('scorebot', {match: null, error: 'Error, please try again'})
-    })
+app.post('/matches/scorebot', function (req, res) {
+    if (!req.query.matches || req.query.matches.length == 0) {
+        res.render('scorebot', {matches: null, error: 'Error, please select matches'});
+    } else if (!req.query.matches || req.query.matches.length >= 4) {
+        res.render('scorebot', {matches: null, error: 'Error, please select no more than 4 matches'});
+    } else {
+        let matches = [];
+        for (i = 0; i < req.query.matches.length; i++) {
+            HLTV.getMatch({id: req.query.matches[i]}).then(match => {
+                matches.append(match);
+            }).catch(err => {
+                console.log(err);
+            })
+        }
+        res.render('scorebot', {matches: matches, error: null});
+    }
     /*
     HLTV.connectToScorebot({id: req.query.id, onScoreboardUpdate: (data) => {
 

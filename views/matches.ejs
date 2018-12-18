@@ -27,34 +27,38 @@
     <% if(matches !== null){ %>
         <% if(matches[0].live){ %>
             <h3 align="center"> LIVE MATCHES </h3>
-            <table>
-                <tr>
-                    <th>Matchup</th>
-                    <th>Format</th>
-                    <th>Tournament</th>
-                    <th>Maps</th>
-                    <th>Analysis/Scorebot</th>
-                </tr>
-                <% for(var i=0; i < matches.length; i++) { %>
-                    <% if(matches[i].live){ %>
-                        <tr>
-                            <td><%= matches[i].team1.name %> vs <%= matches[i].team2.name %></td>
-                            <td><%= matches[i].format %></td>
-                            <td><%= matches[i].event.name %></td>
-                            <td>
-                                <% if(matches[i].maps){ %>
-                                    <% for(var k=0; k < matches[i].maps.length; k++) { %>
-                                        <span> <%= matches[i].maps[k] %> </span>
+            <br>
+            <form action="/results" method="post">
+                <input type="submit" class="ghost-button" value="Connect Scorebots">
+                <table>
+                    <tr>
+                        <th>Matchup</th>
+                        <th>Format</th>
+                        <th>Tournament</th>
+                        <th>Maps</th>
+                        <th>Analysis/Scorebot</th>
+                    </tr>
+                    <% for(var i=0; i < matches.length; i++) { %>
+                        <% if(matches[i].live){ %>
+                            <tr>
+                                <td><%= matches[i].team1.name %> vs <%= matches[i].team2.name %></td>
+                                <td><%= matches[i].format %></td>
+                                <td><%= matches[i].event.name %></td>
+                                <td>
+                                    <% if(matches[i].maps){ %>
+                                        <% for(var k=0; k < matches[i].maps.length; k++) { %>
+                                            <span> <%= matches[i].maps[k] %> </span>
+                                        <% } %>
+                                    <% } else {%>
+                                        <span> No Maps Found </span>
                                     <% } %>
-                                <% } else {%>
-                                    <span> No Maps Found </span>
-                                <% } %>
-                            </td>
-                            <td><a href="matches/scorebot?id=<%= matches[i].id %>"> Scorebot </a></td>
-                        </tr>
+                                </td>
+                                <td><input type="checkbox" name="matches[]" value="<%= matches[i].id %>"><span> Scorebot </span></td>
+                            </tr>
+                        <% } %>
                     <% } %>
-                <% } %>
-            </table>
+                </table>
+            </form>
         <% } %>
         <h3 align="center"> UPCOMING MATCHES </h3>
         <table>
