@@ -126,7 +126,7 @@ app.post('/results', function (req, res) {
     eventParam = eventParam.toUpperCase();
 
     var today = new Date();
-    var dd = today.getDate();
+    var dd = today.getDate() + 1;
     var mm = today.getMonth()+1; //January is 0!
     var yyyy = today.getFullYear();
     if(dd<10) {
@@ -138,7 +138,7 @@ app.post('/results', function (req, res) {
     today = yyyy + '-' + mm + '-' + dd;
 
     let xdaysago = new Date();
-    xdaysago.setDate(xdaysago.getDate() - daysParam + 1);
+    xdaysago.setDate(xdaysago.getDate() - daysParam);
     var dd = xdaysago.getDate();
     var mm = xdaysago.getMonth()+1;
     var yyyy = xdaysago.getFullYear();
@@ -151,6 +151,7 @@ app.post('/results', function (req, res) {
     xdaysago = yyyy + '-' + mm + '-' + dd;
 
     HLTV.getMatchesStats({startDate: xdaysago, endDate: today}).then((answer) => {
+        console.log(xdaysago, today);
         let results = answer
         if(results == undefined){
             res.render('results', {results: null, error: 'Error, please try again', team: teamParam, event: eventParam});
