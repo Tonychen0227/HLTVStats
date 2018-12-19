@@ -6,6 +6,14 @@ const argv = require('yargs').argv;
 const { HLTV } = require('hltv')
 const https = require("https")
 
+var http = require('http');
+
+var server = http.createServer(app);
+var io = require('socket.io').listen(server);  //pass a http.Server instance
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT);
+
 HLTV.createInstance({hltvUrl: 'localhost', loadPage: https.get})
 
 app.set('view engine', 'ejs');
@@ -212,7 +220,11 @@ app.get('/results/detailedstats', function (req, res) {
     });
 })
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Our app is running on port ${ PORT }`);
-});
+
+io.on('connection', function (socket) {
+    console.log('connected')
+    socket.emit('news', { hello: 'world' });
+    socket.on('my other event', function (data) {
+      console.log(data);
+    });
+  });

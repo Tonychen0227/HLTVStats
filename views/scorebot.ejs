@@ -7,6 +7,14 @@
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
   </head>
   <body>
+      <script src="/socket.io/socket.io.js"></script>
+      <script>
+        var socket = io.connect('http://localhost');
+        socket.on('news', function (data) {
+          console.log(data);
+          socket.emit('my other event', { my: 'data' });
+        });
+      </script>
       <fieldset>
           <h1 align="center"> Scorebot </h1>
           <div class="container">
