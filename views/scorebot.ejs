@@ -21,7 +21,7 @@
       
         <% if(match !== null){ %>
           <h3 align="center"> <%=match.team1.name%> vs <%=match.team2.name%> </h3>
-          <h4 align="center"> <%= match.event %> </h4> 
+          <h4 align="center"> <%= match.event.name %> </h4> 
           <h4 align="center"> Maps:
           <% for(var i=0; i < match.maps.length; i++) { %>
             <% if(match.maps[i].statsId){ %>
@@ -41,22 +41,22 @@
             <h5 align="center"> <%=match.additionalInfo%> </h5>
           <% } %>
         <% } else { %>
-          <p> No match found </p>
+          <p align="center"> No match found </p>
         <% } %>
         <% if(update !== null){ %>
           <h4 align="center"> Scoreboard </h4> 
-          <p> <%= JSON.stringify(update) %> </p>
+          <p align="center"> <%= JSON.stringify(update) %> </p>
         <% } else {%>
-          <p> No updates yet </p>
+          <p align="center"> No updates yet </p>
         <% } %>
         <% if(log !== null){ %>
           <h4 align="center"> Log </h4>    
-          <p> <%= JSON.stringify(log) %> </p>
+          <p align="center"> <%= JSON.stringify(log) %> </p>
         <% } else {%>
-          <p> No log yet </p>
+          <p align="center" id="log1"> No log yet </p>
         <% } %>
         <% if(error !== null){ %>
-          <p><%= error %></p>
+          <p align="center"><%= error %></p>
         <% } %>
       </fieldset>
   </body>

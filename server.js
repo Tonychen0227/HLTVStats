@@ -45,32 +45,25 @@ app.get('/', function (req, res) {
 
 app.get('/matches/scorebot', function (req, res) {
     HLTV.getMatch({id: req.query.id}).then(match => {
-        /*
         if (match.hasScorebot) {
             let recentUpdate;
             let recentLog = [];
             HLTV.connectToScorebot({id: req.query.id, onScoreboardUpdate: (data) => {
-                recentUpdate = data;
-                try {
-                    res.render('scorebot', {match: match, update: recentUpdate, log: recentLog, error: null});
-                } catch (err) {
-                    res.redirect(res.render('scorebot', {match: match, update: recentUpdate, log: recentLog, error: null}));
+                if (recentUpdate['money'] == data['money']) {
+                    recentUpdate = data;
+                    console.log(recentUpdate.currentRound, recentUpdate.counterTerroristScore, recentUpdate.terroristScore);
                 }
-            }, onLogUpdate: (data) => {
-                recentLog.push(data);
+            }, onLogUpdate: (data) => { 
+                recentLog.push(data.log[0]);
                 if (recentLog.length > 5) {
                     recentLog.shift();
-                } try {
-                    res.render('scorebot', {match: match, update: recentUpdate, log: recentLog, error: null});
-                } catch (err) {
-                    res.redirect(res.render('scorebot', {match: match, update: log, log: recentLog, error: null}));
-                }
+                } 
+                console.log(recentLog);
             }})
         } else {
-            res.render('scorebot', {match: match, update: null, log: null, error: 'No scorebot found'});
+            //res.render('scorebot', {match: match, update: null, log: null, error: 'Scorebot not found'});
         }
-        */
-       res.render('scorebot', {match: match, update: null, log: null, error: 'No scorebot found'});
+        res.render('scorebot', {match: match, update: null, log: null, error: 'Scorebot not found'});
     }).catch(err => {
         res.render('scorebot', {match: null, update: null, log: null, error: 'Error, please try again'});
     })

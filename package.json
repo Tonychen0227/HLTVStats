@@ -24,6 +24,8 @@
     "hltv": "^2.9.2",
     "http-proxy": "^1.17.0",
     "request": "^2.88.0",
+    "socket.io": "^2.2.0",
+    "socket.io-client": "^2.2.0",
     "yargs": "^12.0.5"
   },
   "postinstall": "npm run build"
