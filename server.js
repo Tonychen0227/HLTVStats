@@ -3,12 +3,14 @@ const app = express();
 const bodyParser = require('body-parser');
 const request = require('request');
 const argv = require('yargs').argv;
-const { HLTV } = require('hltv')
-const https = require("https")
+const { HLTV } = require('hltv');
+const https = require("https");
+
+let scorebot = null;
 
 var currentUrl;
 
-HLTV.createInstance({hltvUrl: 'localhost', loadPage: https.get})
+HLTV.createInstance({hltvUrl: 'localhost', loadPage: https.get});
 
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
@@ -16,6 +18,9 @@ app.use(express.static('images'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', function (req, res) {
+    if (scorebot != null) {
+        scorebot.resolve();
+    }
     console.log('Welcome!');
     currentUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
     var today = new Date();
@@ -48,6 +53,9 @@ app.get('/', function (req, res) {
 })
 
 app.get('/matches/scorebot', function (req, res) {
+    if (scorebot != null) {
+        scorebot.resolve();
+    }
     console.log('Connecting to scorebot... ' + req.query.id);
     currentUrl = req.protocol + '://' + req.get('host') + req.originalUrl
     HLTV.getMatch({id: req.query.id}).then(match => {
@@ -56,7 +64,7 @@ app.get('/matches/scorebot', function (req, res) {
             let editedUpdate;
             let recentUpdate;
             let recentLog = [];
-            HLTV.connectToScorebot({id: req.query.id, onScoreboardUpdate: (data) => {
+            scorebot = HLTV.connectToScorebot({id: req.query.id, onScoreboardUpdate: (data) => {
                 recentUpdate = data;
                 if (currentUrl.indexOf("scorebot") != -1 && currentUrl.indexOf(req.query.id) != -1) {
                     editedUpdate = {
@@ -126,12 +134,18 @@ app.get('/matches/scorebot', function (req, res) {
 })
 
 app.get('/matches/matchanalysis', function (req, res) {
+    if (scorebot != null) {
+        scorebot.resolve();
+    }
     console.log('Requesting analysis for ' + req.query.id);
     currentUrl = req.protocol + '://' + req.get('host') + req.originalUrl
     res.render('matchanalysis', {id: req.query.id, error: null});
 })
 
 app.post('/matches', function (req, res) {
+    if (scorebot != null) {
+        scorebot.resolve();
+    }
     console.log('Requesting matches');
     currentUrl = req.protocol + '://' + req.get('host') + req.originalUrl
     let teamParam = req.body.teamname || "";
@@ -177,6 +191,9 @@ app.post('/matches', function (req, res) {
 })
 
 app.post('/results', function (req, res) {
+    if (scorebot != null) {
+        scorebot.resolve();
+    }
     console.log('Requesting results');
     currentUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
     let teamParam = req.body.teamname || "";
@@ -240,6 +257,9 @@ app.post('/results', function (req, res) {
 })
 
 app.get('/results/detailedstats', function (req, res) {
+    if (scorebot != null) {
+        scorebot.resolve();
+    }
     console.log('Requesting detailed stats for ' + req.query.id);
     currentUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
     HLTV.getMatchMapStats({id: req.query.id}).then((answer) => {
