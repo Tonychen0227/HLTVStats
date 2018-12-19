@@ -52,37 +52,77 @@ app.get('/matches/scorebot', function (req, res) {
     currentUrl = req.protocol + '://' + req.get('host') + req.originalUrl
     HLTV.getMatch({id: req.query.id}).then(match => {
         if (match.hasScorebot) {
+            let previousUpdate;
+            let editedUpdate;
             let recentUpdate;
             let recentLog = [];
             HLTV.connectToScorebot({id: req.query.id, onScoreboardUpdate: (data) => {
+                recentUpdate = data;
                 if (currentUrl.indexOf("scorebot") != -1 && currentUrl.indexOf(req.query.id) != -1) {
-                    if (!recentUpdate || recentUpdate['money'] == data['money']) {
-                        recentUpdate = data;
-                        console.log(recentUpdate.currentRound, recentUpdate.counterTerroristScore, recentUpdate.terroristScore);
+                    editedUpdate = {
+                        'Title': recentUpdate.ctTeamName + " " + recentUpdate.counterTerroristScore + ' - ' + recentUpdate.terroristTeamName + " " + recentUpdate.terroristScore || "",
+                        'CTs': recentUpdate.CT || "",
+                        'Ts': recentUpdate.TERRORIST || "",
+                        'CTName': recentUpdate.ctTeamName || "",
+                        'TName': recentUpdate.terroristTeamName || "",
+                        'Map': recentUpdate.mapName || "",
+                        'ID': req.query.id
+                    }
+                    if (!previousUpdate) {
+                        previousUpdate = editedUpdate;
+                    } else if (previousUpdate != editedUpdate) {
+                        console.log("Update: " + editedUpdate);
+                        // Only so it works for now
+                        if (recentUpdate && recentLog.length == 5) {
+                            res.render('scorebot', {match: match, update: recentUpdate, log: recentLog, error: null});
+                        }
+                        previousUpdate = editedUpdate;
                     }
                 }
             }, onLogUpdate: (data) => { 
+                data = data.log[0];
                 if (currentUrl.indexOf("scorebot") != -1 && currentUrl.indexOf(req.query.id) != -1) {
-                    recentLog.push(data.log[0]);
+                    if (editedLdataog.Kill) {
+                        data = data.killerName + " killed " + data.victimName + " with " + data.weapon;
+                    } else if (data.BombPlanted) {
+                        data = "Bomb planted (" + data.tPlayers + "T vs " + data.ctPlayers + "CT";
+                    } else if (data.BombDefused) {
+                        data = "Bomb has been defused";
+                    } else if (data.RoundStart) {
+                        data = "Round started";
+                    } else if (data.RoundEnd) {
+                        if (data.RoundEnd.winner == 'CT') {
+                            data = "Counter-Terrorists win! " + terroristScore + ' T - ' + counterTerroristScore + ' CT';
+                        } else if (data.RoundEnd.winner == 'TT') {
+                            data = "Terrorists win! " + terroristScore + ' T - ' + counterTerroristScore + ' CT';
+                        }
+                    } else {
+                        data = ""
+                    }
+                    if (data != "") {
+                        recentLog.push(data);
+                    }
                     if (recentLog.length > 5) {
                         recentLog.shift();
                     }
-                    console.log(recentLog);
+                    console.log("Log: " + recentLog);
+                    // Only so it works for now
+                    if (recentUpdate && recentLog.length == 5) {
+                        res.render('scorebot', {match: match, update: recentUpdate, log: recentLog, error: 'Scorebot not found'});
+                    }
                 } 
             }, onConnect: () => {
-                console.log('Scorebot connected' + req.query.id);
+                console.log('Scorebot connected ' + req.query.id);
             }, onDisconnect: () => {
-                console.log('Scorebot disconnected' + req.query.id);
+                console.log('Scorebot disconnected ' + req.query.id);
             }})
         } else {
             console.log('Scorebot not found');
-            //res.render('scorebot', {match: match, update: null, log: null, error: 'Scorebot not found'});
+            res.render('scorebot', {match: match, update: null, log: null, error: 'Scorebot not found'});
         }
-        res.render('scorebot', {match: match, update: null, log: null, error: 'Scorebot not found'});
     }).catch(err => {
         console.log(err);
     })
-    
 })
 
 app.get('/matches/matchanalysis', function (req, res) {
