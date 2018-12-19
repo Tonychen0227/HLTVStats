@@ -6,6 +6,8 @@ const argv = require('yargs').argv;
 const { HLTV } = require('hltv')
 const https = require("https")
 
+var currentUrl;
+
 HLTV.createInstance({hltvUrl: 'localhost', loadPage: https.get})
 
 app.set('view engine', 'ejs');
@@ -14,6 +16,8 @@ app.use(express.static('images'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', function (req, res) {
+    console.log('Welcome!');
+    currentUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
     var today = new Date();
     var dd = today.getDate();
     var mm = today.getMonth()+1; //January is 0!
@@ -44,37 +48,52 @@ app.get('/', function (req, res) {
 })
 
 app.get('/matches/scorebot', function (req, res) {
+    console.log('Connecting to scorebot... ' + req.query.id);
+    currentUrl = req.protocol + '://' + req.get('host') + req.originalUrl
     HLTV.getMatch({id: req.query.id}).then(match => {
         if (match.hasScorebot) {
             let recentUpdate;
             let recentLog = [];
             HLTV.connectToScorebot({id: req.query.id, onScoreboardUpdate: (data) => {
-                if (recentUpdate['money'] == data['money']) {
-                    recentUpdate = data;
-                    console.log(recentUpdate.currentRound, recentUpdate.counterTerroristScore, recentUpdate.terroristScore);
+                if (currentUrl.indexOf("scorebot") != -1 && currentUrl.indexOf(req.query.id) != -1) {
+                    if (!recentUpdate || recentUpdate['money'] == data['money']) {
+                        recentUpdate = data;
+                        console.log(recentUpdate.currentRound, recentUpdate.counterTerroristScore, recentUpdate.terroristScore);
+                    }
                 }
             }, onLogUpdate: (data) => { 
-                recentLog.push(data.log[0]);
-                if (recentLog.length > 5) {
-                    recentLog.shift();
+                if (currentUrl.indexOf("scorebot") != -1 && currentUrl.indexOf(req.query.id) != -1) {
+                    recentLog.push(data.log[0]);
+                    if (recentLog.length > 5) {
+                        recentLog.shift();
+                    }
+                    console.log(recentLog);
                 } 
-                console.log(recentLog);
+            }, onConnect: () => {
+                console.log('Scorebot connected' + req.query.id);
+            }, onDisconnect: () => {
+                console.log('Scorebot disconnected' + req.query.id);
             }})
         } else {
+            console.log('Scorebot not found');
             //res.render('scorebot', {match: match, update: null, log: null, error: 'Scorebot not found'});
         }
         res.render('scorebot', {match: match, update: null, log: null, error: 'Scorebot not found'});
     }).catch(err => {
-        res.render('scorebot', {match: null, update: null, log: null, error: 'Error, please try again'});
+        console.log(err);
     })
     
 })
 
 app.get('/matches/matchanalysis', function (req, res) {
+    console.log('Requesting analysis for ' + req.query.id);
+    currentUrl = req.protocol + '://' + req.get('host') + req.originalUrl
     res.render('matchanalysis', {id: req.query.id, error: null});
 })
 
 app.post('/matches', function (req, res) {
+    console.log('Requesting matches');
+    currentUrl = req.protocol + '://' + req.get('host') + req.originalUrl
     let teamParam = req.body.teamname || "";
     let eventParam = req.body.eventname || "";
 
@@ -118,6 +137,8 @@ app.post('/matches', function (req, res) {
 })
 
 app.post('/results', function (req, res) {
+    console.log('Requesting results');
+    currentUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
     let teamParam = req.body.teamname || "";
     let daysParam = req.body.days || 1;
     let eventParam = req.body.eventname || "";
@@ -179,6 +200,8 @@ app.post('/results', function (req, res) {
 })
 
 app.get('/results/detailedstats', function (req, res) {
+    console.log('Requesting detailed stats for ' + req.query.id);
+    currentUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
     HLTV.getMatchMapStats({id: req.query.id}).then((answer) => {
         let results = answer;
         let currentHistory = results.roundHistory;
