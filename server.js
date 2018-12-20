@@ -6,8 +6,6 @@ const argv = require('yargs').argv;
 const { HLTV } = require('hltv');
 const https = require("https");
 
-let scorebot = null;
-
 let previousUpdate;
 let editedUpdate;
 let recentUpdate;
@@ -60,7 +58,7 @@ app.get('/matches/scorebot', function (req, res) {
     currentUrl = req.protocol + '://' + req.get('host') + req.originalUrl
     HLTV.getMatch({id: req.query.id}).then(match => {
         if (match.hasScorebot) {
-            scorebot = HLTV.connectToScorebot({id: req.query.id, onScoreboardUpdate: (data) => {
+            HLTV.connectToScorebot({id: req.query.id, onScoreboardUpdate: (data) => {
                 recentUpdate = data;
                 if (currentUrl.indexOf("scorebot") != -1 && currentUrl.indexOf(req.query.id) != -1) {
                     editedUpdate = {
@@ -81,7 +79,6 @@ app.get('/matches/scorebot', function (req, res) {
                             rendered = true;
                             console.log("rendering" + editedUpdate + recentLog);
                             res.render('scorebot', {match: match, update: editedUpdate, log: recentLog, error: null});
-                            return;
                         }
                         previousUpdate = editedUpdate;
                     }
@@ -103,7 +100,7 @@ app.get('/matches/scorebot', function (req, res) {
                         if (data.RoundEnd.winner == 'CT') {
                             data = "Counter-Terrorists win! " + data.RoundEnd.terroristScore + ' T - ' + data.RoundEnd.counterTerroristScore + ' CT';
                         } else if (data.RoundEnd.winner == 'TERRORIST') {
-                            data = "Terrorists win! " + data.RoundEnd.terroristScore + ' T - ' + data.RoundEnd.counterTerroristScore + ' CT)';
+                            data = "Terrorists win! " + data.RoundEnd.terroristScore + ' T - ' + data.RoundEnd.counterTerroristScore + ' CT';
                         }
                     } else {
                         data = ""
@@ -119,8 +116,7 @@ app.get('/matches/scorebot', function (req, res) {
                     if (editedUpdate && recentLog.length == 5 && !rendered) {
                         rendered = true;
                         console.log("rendering" + editedUpdate + recentLog);
-                        res.render('scorebot', {match: match, update: editedUpdate, log: recentLog, error: 'Scorebot not found'});
-                        return;
+                        res.render('scorebot', {match: match, update: editedUpdate, log: recentLog, error: null});
                     }
                 } else {
                     throw 'REE';
@@ -129,15 +125,11 @@ app.get('/matches/scorebot', function (req, res) {
                 console.log('Scorebot connected ' + req.query.id);
             }, onDisconnect: () => {
                 console.log('Scorebot disconnected ' + req.query.id);
-            }}).catch (err => {
-                console.log('Quit out');
-            })
+            }})
         } else {
             console.log('Scorebot not found');
             res.render('scorebot', {match: match, update: null, log: null, error: 'Scorebot not found'});
         }
-    }).catch(err => {
-        console.log(err);
     })
 })
 
@@ -145,7 +137,7 @@ app.get('/matches/matchanalysis', function (req, res) {
     console.log('Requesting analysis for ' + req.query.id);
     currentUrl = req.protocol + '://' + req.get('host') + req.originalUrl
     res.render('matchanalysis', {id: req.query.id, error: null});
-})
+})  
 
 app.post('/matches', function (req, res) {
     console.log('Requesting matches');

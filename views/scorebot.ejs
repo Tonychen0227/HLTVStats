@@ -19,10 +19,7 @@
               </form>
               <% if(match !== null){ %>
                 <br>
-                <form action="/matches/scorebot" method="get">
-                  <input type="hidden" name="id" value="<%=match.id%>" /> 
-                  <input type="submit" class="ghost-button" value="Refrezh ;]">
-                </form>
+                <a class="ghost-button" href="matches/scorebot?id=<%= match.id %>" value="Refresh"></a>
               <% } %>
           </div>
       
@@ -60,15 +57,13 @@
                         <th>Kills</th> 
                         <th>Deaths</th>
                         <th>ADR</th>
-                        <th>Rating</th>
                     </tr>
                     <% for(var i = 0; i < update.CTs.length; i++) { %>
                         <tr>
                             <td align="center"><%= update.CTs[i].name %></td>
-                            <td align="center"><%= update.CTs[i].kills %></td>
+                            <td align="center"><%= update.CTs[i].score %></td>
                             <td align="center"><%= update.CTs[i].deaths %></td>
-                            <td align="center"><%= update.CTs[i].ADR %></td>
-                            <td align="center"><%= update.CTs[i].rating %></td>
+                            <td align="center"><%= update.CTs[i].damagePrRound.toFixed(2) %></td>
                         </tr>
                     <% } %>
             </table>
@@ -80,15 +75,13 @@
                         <th>Kills</th> 
                         <th>Deaths</th>
                         <th>ADR</th>
-                        <th>Rating</th>
                     </tr>
                     <% for(var i = 0; i < update.Ts.length; i++) { %>
                         <tr>
                             <td align="center"><%= update.Ts[i].name %></td>
-                            <td align="center"><%= update.Ts[i].kills %></td>
+                            <td align="center"><%= update.Ts[i].score %></td>
                             <td align="center"><%= update.Ts[i].deaths %></td>
-                            <td align="center"><%= update.Ts[i].ADR %></td>
-                            <td align="center"><%= update.Ts[i].rating %></td>
+                            <td align="center"><%= update.Ts[i].damagePrRound.toFixed(2) %></td>
                         </tr>
                     <% } %>
             </table>
@@ -97,7 +90,7 @@
         <% } %>
         <% if(log !== null){ %>
           <h4 align="center"> Log </h4>    
-          <% for(var i = 0; i < log.length; i++) { %>
+          <% for(var i = log.length - 1; i >= 0; i--) { %>
               <h5 align="center"><%= log[i] %></h5>
           <% } %>
         <% } else {%>
