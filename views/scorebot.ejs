@@ -17,6 +17,13 @@
               <form action="/matches" method="post">
                     <input type="submit" class="ghost-button" value="Back to Matches">
               </form>
+              <% if(match !== null){ %>
+                <br>
+                <form action="/matches/scorebot" method="get">
+                  <input type="hidden" name="id" value="<%=match.id%>" /> 
+                  <input type="submit" class="ghost-button" value="Refresh">
+                </form>
+              <% } %>
           </div>
       
         <% if(match !== null){ %>
@@ -44,14 +51,55 @@
           <p align="center"> No match found </p>
         <% } %>
         <% if(update !== null){ %>
-          <h4 align="center"> Scoreboard </h4> 
-          <p align="center"> <%= JSON.stringify(update) %> </p>
+          <h3 align="center"> Scoreboard </h3> 
+          <h4 align="center"> <%= update.Title %> </h4> 
+          <h4 align="center"> <%= update.CTName %> Player Stats </h4>
+            <table>
+                    <tr>
+                        <th>Player</th>
+                        <th>Kills</th> 
+                        <th>Deaths</th>
+                        <th>ADR</th>
+                        <th>Rating</th>
+                    </tr>
+                    <% for(var i = 0; i < update.CTs.length; i++) { %>
+                        <tr>
+                            <td align="center"><%= update.CTs[i].name %></td>
+                            <td align="center"><%= update.CTs[i].kills %></td>
+                            <td align="center"><%= update.CTs[i].deaths %></td>
+                            <td align="center"><%= update.CTs[i].ADR %></td>
+                            <td align="center"><%= update.CTs[i].rating %></td>
+                        </tr>
+                    <% } %>
+            </table>
+            <br>
+            <h4 align="center"> <%= update.TName %> Player Stats </h4>
+            <table>
+                    <tr>
+                        <th>Player</th>
+                        <th>Kills</th> 
+                        <th>Deaths</th>
+                        <th>ADR</th>
+                        <th>Rating</th>
+                    </tr>
+                    <% for(var i = 0; i < update.Ts.length; i++) { %>
+                        <tr>
+                            <td align="center"><%= update.Ts[i].name %></td>
+                            <td align="center"><%= update.Ts[i].kills %></td>
+                            <td align="center"><%= update.Ts[i].deaths %></td>
+                            <td align="center"><%= update.Ts[i].ADR %></td>
+                            <td align="center"><%= update.Ts[i].rating %></td>
+                        </tr>
+                    <% } %>
+            </table>
         <% } else {%>
           <p align="center"> No updates yet </p>
         <% } %>
         <% if(log !== null){ %>
           <h4 align="center"> Log </h4>    
-          <p align="center"> <%= JSON.stringify(log) %> </p>
+          <% for(var i = 0; i < log.length; i++) { %>
+              <h5 align="center"><%= log[i] %></h5>
+          <% } %>
         <% } else {%>
           <p align="center" id="log1"> No log yet </p>
         <% } %>

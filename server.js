@@ -8,6 +8,11 @@ const https = require("https");
 
 let scorebot = null;
 
+let previousUpdate;
+let editedUpdate;
+let recentUpdate;
+let recentLog = [];
+
 var currentUrl;
 
 HLTV.createInstance({hltvUrl: 'localhost', loadPage: https.get});
@@ -17,10 +22,7 @@ app.use(express.static('public'));
 app.use(express.static('images'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get('/', function (req, res) {
-    if (scorebot != null) {
-        scorebot.resolve();
-    }
+app.get('/', function (req, res) { 
     console.log('Welcome!');
     currentUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
     var today = new Date();
@@ -53,22 +55,16 @@ app.get('/', function (req, res) {
 })
 
 app.get('/matches/scorebot', function (req, res) {
-    if (scorebot != null) {
-        scorebot.resolve();
-    }
+    let rendered = false;
     console.log('Connecting to scorebot... ' + req.query.id);
     currentUrl = req.protocol + '://' + req.get('host') + req.originalUrl
     HLTV.getMatch({id: req.query.id}).then(match => {
         if (match.hasScorebot) {
-            let previousUpdate;
-            let editedUpdate;
-            let recentUpdate;
-            let recentLog = [];
             scorebot = HLTV.connectToScorebot({id: req.query.id, onScoreboardUpdate: (data) => {
                 recentUpdate = data;
                 if (currentUrl.indexOf("scorebot") != -1 && currentUrl.indexOf(req.query.id) != -1) {
                     editedUpdate = {
-                        'Title': recentUpdate.ctTeamName + " " + recentUpdate.counterTerroristScore + ' - ' + recentUpdate.terroristTeamName + " " + recentUpdate.terroristScore || "",
+                        'Title': recentUpdate.ctTeamName + " " + recentUpdate.counterTerroristScore + ' - ' + recentUpdate.terroristScore + " " + recentUpdate.terroristTeamName || "",
                         'CTs': recentUpdate.CT || "",
                         'Ts': recentUpdate.TERRORIST || "",
                         'CTName': recentUpdate.ctTeamName || "",
@@ -79,30 +75,35 @@ app.get('/matches/scorebot', function (req, res) {
                     if (!previousUpdate) {
                         previousUpdate = editedUpdate;
                     } else if (previousUpdate != editedUpdate) {
-                        console.log("Update: " + editedUpdate);
+                        console.log("Update found");
                         // Only so it works for now
-                        if (recentUpdate && recentLog.length == 5) {
-                            res.render('scorebot', {match: match, update: recentUpdate, log: recentLog, error: null});
+                        if (editedUpdate && recentLog.length == 5 && !rendered) {
+                            rendered = true;
+                            console.log("rendering" + editedUpdate + recentLog);
+                            res.render('scorebot', {match: match, update: editedUpdate, log: recentLog, error: null});
+                            return;
                         }
                         previousUpdate = editedUpdate;
                     }
+                } else {
+                    throw 'REE';
                 }
             }, onLogUpdate: (data) => { 
                 data = data.log[0];
                 if (currentUrl.indexOf("scorebot") != -1 && currentUrl.indexOf(req.query.id) != -1) {
-                    if (editedLdataog.Kill) {
-                        data = data.killerName + " killed " + data.victimName + " with " + data.weapon;
+                    if (data.Kill) {
+                        data = data.Kill.killerName + " killed " + data.Kill.victimName + " with " + data.Kill.weapon;
                     } else if (data.BombPlanted) {
-                        data = "Bomb planted (" + data.tPlayers + "T vs " + data.ctPlayers + "CT";
+                        data = "Bomb planted (" + data.BombPlanted.tPlayers + " T vs " + data.BombPlanted.ctPlayers + " CT)";
                     } else if (data.BombDefused) {
                         data = "Bomb has been defused";
                     } else if (data.RoundStart) {
                         data = "Round started";
                     } else if (data.RoundEnd) {
                         if (data.RoundEnd.winner == 'CT') {
-                            data = "Counter-Terrorists win! " + terroristScore + ' T - ' + counterTerroristScore + ' CT';
-                        } else if (data.RoundEnd.winner == 'TT') {
-                            data = "Terrorists win! " + terroristScore + ' T - ' + counterTerroristScore + ' CT';
+                            data = "Counter-Terrorists win! " + data.RoundEnd.terroristScore + ' T - ' + data.RoundEnd.counterTerroristScore + ' CT';
+                        } else if (data.RoundEnd.winner == 'TERRORIST') {
+                            data = "Terrorists win! " + data.RoundEnd.terroristScore + ' T - ' + data.RoundEnd.counterTerroristScore + ' CT)';
                         }
                     } else {
                         data = ""
@@ -113,17 +114,24 @@ app.get('/matches/scorebot', function (req, res) {
                     if (recentLog.length > 5) {
                         recentLog.shift();
                     }
-                    console.log("Log: " + recentLog);
+                    console.log("Log found");
                     // Only so it works for now
-                    if (recentUpdate && recentLog.length == 5) {
-                        res.render('scorebot', {match: match, update: recentUpdate, log: recentLog, error: 'Scorebot not found'});
+                    if (editedUpdate && recentLog.length == 5 && !rendered) {
+                        rendered = true;
+                        console.log("rendering" + editedUpdate + recentLog);
+                        res.render('scorebot', {match: match, update: editedUpdate, log: recentLog, error: 'Scorebot not found'});
+                        return;
                     }
-                } 
+                } else {
+                    throw 'REE';
+                }
             }, onConnect: () => {
                 console.log('Scorebot connected ' + req.query.id);
             }, onDisconnect: () => {
                 console.log('Scorebot disconnected ' + req.query.id);
-            }})
+            }}).catch (err => {
+                console.log('Quit out');
+            })
         } else {
             console.log('Scorebot not found');
             res.render('scorebot', {match: match, update: null, log: null, error: 'Scorebot not found'});
@@ -134,18 +142,12 @@ app.get('/matches/scorebot', function (req, res) {
 })
 
 app.get('/matches/matchanalysis', function (req, res) {
-    if (scorebot != null) {
-        scorebot.resolve();
-    }
     console.log('Requesting analysis for ' + req.query.id);
     currentUrl = req.protocol + '://' + req.get('host') + req.originalUrl
     res.render('matchanalysis', {id: req.query.id, error: null});
 })
 
 app.post('/matches', function (req, res) {
-    if (scorebot != null) {
-        scorebot.resolve();
-    }
     console.log('Requesting matches');
     currentUrl = req.protocol + '://' + req.get('host') + req.originalUrl
     let teamParam = req.body.teamname || "";
@@ -191,9 +193,6 @@ app.post('/matches', function (req, res) {
 })
 
 app.post('/results', function (req, res) {
-    if (scorebot != null) {
-        scorebot.resolve();
-    }
     console.log('Requesting results');
     currentUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
     let teamParam = req.body.teamname || "";
@@ -257,9 +256,6 @@ app.post('/results', function (req, res) {
 })
 
 app.get('/results/detailedstats', function (req, res) {
-    if (scorebot != null) {
-        scorebot.resolve();
-    }
     console.log('Requesting detailed stats for ' + req.query.id);
     currentUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
     HLTV.getMatchMapStats({id: req.query.id}).then((answer) => {
