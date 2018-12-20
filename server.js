@@ -98,6 +98,8 @@ function logUpdate(id, data) {
 function disconnect(id) {
     if (connectedScorebots.indexOf(id) != -1) {
         connectedScorebots.splice(connectedScorebots.indexOf(id), 1);
+        delete recentUpdates[id];
+        delete recentLogs[id];
     }
 }
 
