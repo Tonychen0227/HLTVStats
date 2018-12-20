@@ -108,7 +108,7 @@ function connect(id) {
 }
 app.get('/matches/scorebot', function (req, res) {
     console.log('Requesting scorebot ' + req.query.id);
-    console.log(connectedScorebots + typeof connectScorebots[0] + typeof req.query.id);
+    console.log(connectedScorebots + typeof connectedScorebots[0] + typeof req.query.id);
     HLTV.getMatch({id: req.query.id}).then(match => {
         if (connectedScorebots.indexOf(req.query.id) != -1) {
             console.log('Waiting on render');
