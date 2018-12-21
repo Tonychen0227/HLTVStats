@@ -11,6 +11,8 @@ var recentLogs = {};
 var connectedScorebots = [];
 var requestedScorebots = [];
 
+var requesting = true;
+
 HLTV.createInstance({hltvUrl: 'localhost', loadPage: https.get});
 
 app.set('view engine', 'ejs');
@@ -171,6 +173,11 @@ app.get('/matches/matchanalysis', function (req, res) {
 })  
 
 app.post('/matches', function (req, res) {
+    if (requesting) {
+        res.render('matches', {matches: null, error: 'Please try again later', team: teamParam, event: eventParam});
+    } else {
+        requesting = true;
+    }
     console.log('Requesting matches');
     let teamParam = req.body.teamname || "";
     let eventParam = req.body.eventname || "";
@@ -179,7 +186,7 @@ app.post('/matches', function (req, res) {
     eventParam = eventParam.toUpperCase();
 
     HLTV.getMatches().then((answer) => {
-        let matches = answer
+        let matches = answer;
         if(matches == undefined){
             res.render('matches', {matches: null, error: 'Error, please try again', team: teamParam, event: eventParam});
         } else {
@@ -236,6 +243,7 @@ app.post('/matches', function (req, res) {
         res.render('matches', {matches: null, error: 'Error, please try again', team: teamParam, event: eventParam});
         console.log(err)
     });
+    requesting = false;
 })
 
 app.post('/results', function (req, res) {
