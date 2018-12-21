@@ -110,9 +110,9 @@ function logUpdate(id, data) {
         reset = recentLogs[id.toString()].length;
     } else if (data.RoundEnd) {
         if (data.RoundEnd.winner == 'CT') {
-            data = "Counter-Terrorists win! " + data.RoundEnd.terroristScore + ' T - ' + data.RoundEnd.counterTerroristScore + ' CT';
+            data = "Counter-Terrorists win! " + data.RoundEnd.counterTerroristScore + ' CT - ' + data.RoundEnd.terroristScore + ' T';
         } else if (data.RoundEnd.winner == 'TERRORIST') {
-            data = "Terrorists win! " + data.RoundEnd.terroristScore + ' T - ' + data.RoundEnd.counterTerroristScore + ' CT';
+            data = "Terrorists win! " + data.RoundEnd.counterTerroristScore + ' CT - ' + data.RoundEnd.terroristScore + ' T';
         }
     } else {
         data = ""
