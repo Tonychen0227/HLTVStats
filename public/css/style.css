@@ -66,6 +66,33 @@ body {
     -o-transition: all 0.1s ease-in-out;
     transition: all 0.1s ease-in-out;
   }
+
+  .ct-win {
+    background-color: transparent;
+    border:2px solid #ddd;
+    padding:10px 30px;
+    width: 100%;
+    min-width: 350px;
+    -webkit-transition: all 0.1s ease-in-out;
+    -moz-transition: all 0.1s ease-in-out;
+    -ms-transition: all 0.1s ease-in-out;
+    -o-transition: all 0.1s ease-in-out;
+    transition: all 0.1s ease-in-out;
+  }
+
+  .ct-win {
+    background-color: transparent;
+    border:2px solid #ddd;
+    padding:10px 30px;
+    width: 100%;
+    min-width: 350px;
+    -webkit-transition: all 0.1s ease-in-out;
+    -moz-transition: all 0.1s ease-in-out;
+    -ms-transition: all 0.1s ease-in-out;
+    -o-transition: all 0.1s ease-in-out;
+    transition: all 0.1s ease-in-out;
+  }
+
   .ghost-button:hover {
     border:2px solid #515151;
   }
@@ -92,6 +119,11 @@ body {
   .roundIcon{
     height: 25px;
     width: 25px;
+  }
+
+  .aliveIcon{
+    height: 30px;
+    width: 30px;
   }
 
   select {

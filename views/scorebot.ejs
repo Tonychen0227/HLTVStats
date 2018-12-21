@@ -24,10 +24,9 @@
           </div>
       
         <% if(match !== null){ %>
-          <h3 align="center"> <%=match.team1.name%> vs <%=match.team2.name%> </h3>
-          <h4 align="center"> <%= match.event.name %> </h4> 
+          <h3 align="center"> <%=match.team1.name%> vs <%=match.team2.name%> - <%= match.event.name %> </h3>
           <h4 align="center"> Maps:
-          <% for(var i=0; i < match.maps.length; i++) { %>
+          <% for(var i=0; i < match.maps.length - 1; i++) { %>
             <% if(match.maps[i].statsId){ %>
               <a href="../results/detailedstats?id=<%=match.maps[i].statsId%>"><span> <%=match.maps[i].name%></span></a>
             <% } else { %>
@@ -41,26 +40,74 @@
             <% } %>
           <% } %>
           </h4>
-          <% if(match.additionalInfo.trim() != ""){ %>
-            <h5 align="center"> <%=match.additionalInfo%> </h5>
-          <% } %>
         <% } else { %>
           <p align="center"> No match found </p>
         <% } %>
         <% if(update !== null){ %>
-          <h3 align="center"> Scoreboard </h3> 
           <h4 align="center"> <%= update.Title %> </h4> 
+          <br>
+          <% if(log !== null){ %>
+            <% for(var i = log.length - 1; i >= 0; i--) { %>
+                <h5 align="center"><%= log[i] %></h5>
+            <% } %>
+          <% } else {%>
+            <p align="center" id="log1"> No log yet </p>
+          <% } %>
+          <br>
+          <% if(update.RoundHist.length > 0){ %>
+            <h5 align="center">
+            <% for(var i = 0; i < update.RoundHist.length && i < 15; i++) { %>
+              <% if(update.RoundHist[i] == "Terrorists_Win"){ %>
+                  <span> <img class="roundIcon" src="../images/TerroristKill.png"></img> </span>
+              <% }  else if (update.RoundHist[i] == "CTs_Win"){ %>
+                  <span> <img class="roundIcon" src="../images/CTerroristKill.png"></img> </span>
+              <% }  else if (update.RoundHist[i] == "Target_Bombed") { %>
+                  <span> <img class="roundIcon" src="../images/TerroristBomb.png"></img> </span>
+              <% }  else if (update.RoundHist[i] == "Bomb_Defused") { %>
+                  <span> <img class="roundIcon" src="../images/CTerroristBomb.png"></img> </span>
+              <% }  else { %>
+                  <span> <img class="roundIcon" src="../images/Timeout.png"></img> </span>
+              <% } %>
+            <% } %>
+            </h5>
+          <% } %>
+          <% if(update.RoundHist.length > 15){ %>
+            <h5 align="center">
+            <% for(var i = 15; i < update.RoundHist.length; i++) { %>
+              <% if(update.RoundHist[i] == "Terrorists_Win"){ %>
+                  <span> <img class="roundIcon" src="../images/TerroristKill.png"></img> </span>
+              <% }  else if (update.RoundHist[i] == "CTs_Win"){ %>
+                  <span> <img class="roundIcon" src="../images/CTerroristKill.png"></img> </span>
+              <% }  else if (update.RoundHist[i] == "Target_Bombed") { %>
+                  <span> <img class="roundIcon" src="../images/TerroristBomb.png"></img> </span>
+              <% }  else if (update.RoundHist[i] == "Bomb_Defused") { %>
+                  <span> <img class="roundIcon" src="../images/CTerroristBomb.png"></img> </span>
+              <% }  else { %>
+                  <span> <img class="roundIcon" src="../images/Timeout.png"></img> </span>
+              <% } %>
+            <% } %>
+            </h5>
+          <% } %>
+          <br>
           <h4 align="center"> <%= update.CTName %> Player Stats </h4>
             <table>
                     <tr>
+                        <th>Alive</th>
                         <th>Player</th>
+                        <th>Money</th>
                         <th>Kills</th> 
                         <th>Deaths</th>
                         <th>ADR</th>
                     </tr>
                     <% for(var i = 0; i < update.CTs.length; i++) { %>
                         <tr>
-                            <td align="center"><%= update.CTs[i].name %></td>
+                            <% if(update.CTs[i].alive){ %>
+                              <td align="center"><img class="aliveIcon" src="../images/Alive.png"></img></td>
+                            <% }  else { %>
+                              <td align="center"><img class="aliveIcon" src="../images/Dead.png"></img></td>
+                            <% } %>
+                            <td align="center"><%= update.CTs[i].nick %></td>
+                            <td align="center"><%= update.CTs[i].money %></td>
                             <td align="center"><%= update.CTs[i].score %></td>
                             <td align="center"><%= update.CTs[i].deaths %></td>
                             <td align="center"><%= update.CTs[i].damagePrRound.toFixed(2) %></td>
@@ -71,30 +118,30 @@
             <h4 align="center"> <%= update.TName %> Player Stats </h4>
             <table>
                     <tr>
-                        <th>Player</th>
-                        <th>Kills</th> 
-                        <th>Deaths</th>
-                        <th>ADR</th>
+                      <th>Alive</th>
+                      <th>Player</th>
+                      <th>Money</th>
+                      <th>Kills</th> 
+                      <th>Deaths</th>
+                      <th>ADR</th>
                     </tr>
                     <% for(var i = 0; i < update.Ts.length; i++) { %>
-                        <tr>
-                            <td align="center"><%= update.Ts[i].name %></td>
-                            <td align="center"><%= update.Ts[i].score %></td>
-                            <td align="center"><%= update.Ts[i].deaths %></td>
-                            <td align="center"><%= update.Ts[i].damagePrRound.toFixed(2) %></td>
-                        </tr>
+                      <tr>
+                        <% if(update.Ts[i].alive){ %>
+                          <td align="center"><img class="aliveIcon" src="../images/Alive.png"></img></td>
+                        <% }  else { %>
+                          <td align="center"><img class="aliveIcon" src="../images/Dead.png"></img></td>
+                        <% } %>
+                        <td align="center"><%= update.Ts[i].nick %></td>
+                        <td align="center"><%= update.Ts[i].money %></td>
+                        <td align="center"><%= update.Ts[i].score %></td>
+                        <td align="center"><%= update.Ts[i].deaths %></td>
+                        <td align="center"><%= update.Ts[i].damagePrRound.toFixed(2) %></td>
+                      </tr>
                     <% } %>
             </table>
         <% } else {%>
           <p align="center"> No updates yet </p>
-        <% } %>
-        <% if(log !== null){ %>
-          <h4 align="center"> Log </h4>    
-          <% for(var i = log.length - 1; i >= 0; i--) { %>
-              <h5 align="center"><%= log[i] %></h5>
-          <% } %>
-        <% } else {%>
-          <p align="center" id="log1"> No log yet </p>
         <% } %>
         <% if(error !== null){ %>
           <p align="center"><%= error %></p>

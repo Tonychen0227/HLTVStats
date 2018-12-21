@@ -9,6 +9,7 @@ const https = require("https");
 var recentUpdates = {};
 var recentLogs = {};
 var connectedScorebots = [];
+var requestedScorebots = [];
 
 HLTV.createInstance({hltvUrl: 'localhost', loadPage: https.get});
 
@@ -50,31 +51,63 @@ app.get('/', function (req, res) {
 
 function scoreboardUpdate(id, data) {
     let recentUpdate = data;
+    let history = [];
+    let updateCT;
+    let updateT;
+    for (var i = 0; i < recentUpdate.ctMatchHistory.firstHalf.length; i++) {
+        updateCT = recentUpdate.ctMatchHistory.firstHalf[i];
+        updateT = recentUpdate.terroristMatchHistory.firstHalf[i];
+        if (updateCT.type == "lost") {
+            history.push(updateT.type);
+        } else {
+            history.push(updateCT.type);
+        }
+    }
+    for (var i = 0; i < recentUpdate.ctMatchHistory.secondHalf.length; i++) {
+        updateCT = recentUpdate.ctMatchHistory.secondHalf[i];
+        updateT = recentUpdate.terroristMatchHistory.secondHalf[i];
+        if (updateCT.type == "lost") {
+            history.push(updateT.type);
+        } else {
+            history.push(updateCT.type);
+        }
+    }
     editedUpdate = {
-        'Title': recentUpdate.ctTeamName + " " + recentUpdate.counterTerroristScore + ' - ' + recentUpdate.terroristScore + " " + recentUpdate.terroristTeamName || "",
+        'Title': recentUpdate.ctTeamName + " (CT) " + recentUpdate.counterTerroristScore + ' - ' + recentUpdate.terroristScore + " " + (recentUpdate.terroristTeamName || "") + " (T) ",
         'CTs': recentUpdate.CT || "",
         'Ts': recentUpdate.TERRORIST || "",
         'CTName': recentUpdate.ctTeamName || "",
         'TName': recentUpdate.terroristTeamName || "",
         'Map': recentUpdate.mapName || "",
-        'ID': id
+        'ID': id.toString(),
+        'RoundHist': history
     }
-    if (!recentUpdates[id]) {
-        recentUpdates[id] = {}
+    if (!recentUpdates[id.toString()]) {
+        recentUpdates[id.toString()] = {}
     }
-    recentUpdates[id] = editedUpdate
+    recentUpdates[id.toString()] = editedUpdate
 }
 
 function logUpdate(id, data) {
+    let reset = -1
     data = data.log[0];
     if (data.Kill) {
-        data = data.Kill.killerName + " killed " + data.Kill.victimName + " with " + data.Kill.weapon;
+        if (data.Kill.killerSide == 'CT' && data.Kill.victimSide == 'TERRORIST') {
+            data = data.Kill.killerNick + " (CT) killed " + data.Kill.victimNick + " (T) with " + data.Kill.weapon;
+        } else if (data.Kill.killerSide == 'TERRORIST' && data.Kill.victimSide == 'CT') {
+            data = data.Kill.killerNick + " (T) killed " + data.Kill.victimNick + " (CT) with " + data.Kill.weapon;
+        } else if (data.Kill.killerSide == 'CT') {
+            data = data.Kill.killerNick + " (CT) team killed " + data.Kill.victimNick + " (CT) with " + data.Kill.weapon;
+        } else {
+            data = data.Kill.killerNick + " (T) team killed " + data.Kill.victimNick + " (T) with " + data.Kill.weapon;
+        }
     } else if (data.BombPlanted) {
         data = "Bomb planted (" + data.BombPlanted.tPlayers + " T vs " + data.BombPlanted.ctPlayers + " CT)";
     } else if (data.BombDefused) {
         data = "Bomb has been defused";
     } else if (data.RoundStart) {
         data = "Round started";
+        reset = recentLogs[id.toString()].length;
     } else if (data.RoundEnd) {
         if (data.RoundEnd.winner == 'CT') {
             data = "Counter-Terrorists win! " + data.RoundEnd.terroristScore + ' T - ' + data.RoundEnd.counterTerroristScore + ' CT';
@@ -85,32 +118,31 @@ function logUpdate(id, data) {
         data = ""
     }
     if (data != "") {
-        if (!recentLogs[id]) {
-            recentLogs[id] = []
+        if (!recentLogs[id.toString()]) {
+            recentLogs[id.toString()] = []
         }
-        recentLogs[id].push(data);
-        if (recentLogs[id].length > 5) {
-            recentLogs[id].shift();
+        recentLogs[id.toString()].push(data);
+        if (reset != -1) {
+            recentLogs[id.toString()].splice(0, reset);
         }
     }
 }
 
 function disconnect(id) {
-    if (connectedScorebots.indexOf(id) != -1) {
-        connectedScorebots.splice(connectedScorebots.indexOf(id), 1);
-        delete recentUpdates[id];
-        delete recentLogs[id];
+    if (connectedScorebots.indexOf(id.toString()) != -1) {
+        connectedScorebots.splice(connectedScorebots.indexOf(id.toString()), 1);
+        delete recentUpdates[id.toString()];
+        delete recentLogs[id.toString()];
     }
 }
 
 function connect(id) {
-    if (connectedScorebots.indexOf(id) == -1) {
-        connectedScorebots.push(id);
+    if (connectedScorebots.indexOf(id.toString()) == -1) {
+        connectedScorebots.push(id.toString());
     }
 }
 app.get('/matches/scorebot', function (req, res) {
     console.log('Requesting scorebot ' + req.query.id);
-    console.log(connectedScorebots + typeof connectedScorebots[0] + typeof req.query.id);
     HLTV.getMatch({id: req.query.id}).then(match => {
         if (connectedScorebots.indexOf(req.query.id) != -1) {
             console.log('Waiting on render');
@@ -144,7 +176,6 @@ app.post('/matches', function (req, res) {
 
     HLTV.getMatches().then((answer) => {
         let matches = answer
-        let liveIDs = [];
         if(matches == undefined){
             res.render('matches', {matches: null, error: 'Error, please try again', team: teamParam, event: eventParam});
         } else {
@@ -172,9 +203,9 @@ app.post('/matches', function (req, res) {
                 matches = output;
             }
             for (var i = 0; i < matches.length; i++) {
-                if (matches[i].live) {
-                    liveIDs.push(matches[i].id);
+                if (matches[i].live && requestedScorebots.indexOf(matches[i].id.toString())) {
                     let matchId = matches[i].id;
+                    requestedScorebots.push(matchId.toString());
                     setTimeout(() => null, 2000);
                     console.log("Trying to connect scorebot " + matchId)
                     HLTV.connectToScorebot({id: matchId, onScoreboardUpdate: (data) => {
@@ -188,6 +219,7 @@ app.post('/matches', function (req, res) {
                         console.log('Scorebot disconnected ' + matchId);
                         disconnect(matchId);
                     }})
+                    setTimeout(() => null, 2000);
                 } else {
                     break;
                 }
