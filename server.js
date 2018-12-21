@@ -208,8 +208,8 @@ app.post('/matches', function (req, res) {
             }
             for (var i = 0; i < matches.length; i++) {
                 let matchId = matches[i].id;
-                if (connectedScorebots.indexOf(matchId.toString()) == -1) {
-                    requestedScorebots.pop();
+                if (connectedScorebots.indexOf(matchId.toString()) == -1 && requestedScorebots.indexOf(matchId.toString()) != -1) {
+                    requestedScorebots.splice(requestedScorebots.indexOf(matchId.toString()), 1);
                 }
                 if (matches[i].live && requestedScorebots.indexOf(matches[i].id.toString())) {
                     requestedScorebots.push(matchId.toString());
