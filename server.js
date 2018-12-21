@@ -325,7 +325,7 @@ app.get('/results/detailedstats', function (req, res) {
             }
         }
         if (newHistory.length > 30) {
-            newHistory.splice(30, newHistroy.length - 30);
+            newHistory.splice(30, newHistory.length - 30);
         }
         results.roundHistory = newHistory;
         if(results == undefined){
