@@ -107,7 +107,6 @@ function logUpdate(id, data) {
         data = "Bomb has been defused";
     } else if (data.RoundStart) {
         data = "Round started";
-        reset = recentLogs[id.toString()].length;
     } else if (data.RoundEnd) {
         if (data.RoundEnd.winner == 'CT') {
             data = "Counter-Terrorists win! " + data.RoundEnd.counterTerroristScore + ' CT - ' + data.RoundEnd.terroristScore + ' T';
@@ -119,11 +118,17 @@ function logUpdate(id, data) {
     }
     if (data != "") {
         if (!recentLogs[id.toString()]) {
-            recentLogs[id.toString()] = []
+            recentLogs[id.toString()] = [];
+        }
+        if (data.RoundStart) {
+            reset = recentLogs[id.toString()].length;
         }
         recentLogs[id.toString()].push(data);
         if (reset != -1) {
             recentLogs[id.toString()].splice(0, reset);
+        }
+        if (recentLogs[id.toString()].length > 15) {
+            recentLogs[id.toString()] = [];
         }
     }
 }
@@ -142,7 +147,7 @@ function connect(id) {
     }
 }
 app.get('/matches/scorebot', function (req, res) {
-    console.log('Requesting scorebot ' + req.query.id);
+    console.log('Requesting updated data for ' + req.query.id);
     HLTV.getMatch({id: req.query.id}).then(match => {
         if (connectedScorebots.indexOf(req.query.id) != -1) {
             if (recentUpdates[req.query.id] && recentLogs[req.query.id]) {
@@ -202,8 +207,11 @@ app.post('/matches', function (req, res) {
                 matches = output;
             }
             for (var i = 0; i < matches.length; i++) {
+                let matchId = matches[i].id;
+                if (connectedScorebots.indexOf(matchId.toString()) == -1) {
+                    requestedScorebots.pop();
+                }
                 if (matches[i].live && requestedScorebots.indexOf(matches[i].id.toString())) {
-                    let matchId = matches[i].id;
                     requestedScorebots.push(matchId.toString());
                     setTimeout(() => null, 2000);
                     console.log("Trying to connect scorebot " + matchId)
@@ -218,7 +226,6 @@ app.post('/matches', function (req, res) {
                         console.log('Scorebot disconnected ' + matchId);
                         disconnect(matchId);
                     }})
-                    setTimeout(() => null, 2000);
                 } else {
                     break;
                 }
