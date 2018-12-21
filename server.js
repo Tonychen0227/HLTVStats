@@ -11,7 +11,7 @@ var recentLogs = {};
 var connectedScorebots = [];
 var requestedScorebots = [];
 
-var requesting = true;
+var requesting = false;
 
 HLTV.createInstance({hltvUrl: 'localhost', loadPage: https.get});
 
