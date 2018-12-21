@@ -120,7 +120,7 @@ function logUpdate(id, data) {
         if (!recentLogs[id.toString()]) {
             recentLogs[id.toString()] = [];
         }
-        if (data.RoundStart) {
+        if (data == "Round started") {
             reset = recentLogs[id.toString()].length;
         }
         recentLogs[id.toString()].push(data);
