@@ -145,7 +145,6 @@ app.get('/matches/scorebot', function (req, res) {
     console.log('Requesting scorebot ' + req.query.id);
     HLTV.getMatch({id: req.query.id}).then(match => {
         if (connectedScorebots.indexOf(req.query.id) != -1) {
-            console.log('Waiting on render');
             if (recentUpdates[req.query.id] && recentLogs[req.query.id]) {
                 res.render('scorebot', {match: match, update: recentUpdates[req.query.id], log: recentLogs[req.query.id], error: null});
             } else if (recentUpdates[req.query.id]) {

@@ -25,8 +25,8 @@
       
         <% if(match !== null){ %>
           <h3 align="center"> <%=match.team1.name%> vs <%=match.team2.name%> - <%= match.event.name %> </h3>
-          <h4 align="center"> Maps:
-          <% for(var i=0; i < match.maps.length - 1; i++) { %>
+          <h4 align="center"> Maps: 
+          <% for(var i=0; i < match.maps.length; i++) { %>
             <% if(match.maps[i].statsId){ %>
               <a href="../results/detailedstats?id=<%=match.maps[i].statsId%>"><span> <%=match.maps[i].name%></span></a>
             <% } else { %>
