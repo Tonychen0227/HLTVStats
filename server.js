@@ -175,6 +175,7 @@ app.get('/matches/matchanalysis', function (req, res) {
 app.post('/matches', function (req, res) {
     if (requesting) {
         res.render('matches', {matches: null, error: 'Please try again later', team: null, event: null});
+        return;
     } else {
         requesting = true;
     }
