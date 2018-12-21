@@ -324,6 +324,9 @@ app.get('/results/detailedstats', function (req, res) {
                 newHistory.push({outcome: "time_out", score: (parseInt(pieces[0]) + 1).toString() + "-" + pieces[1]});
             }
         }
+        if (newHistory.length > 30) {
+            newHistroy.splice(30, newHistroy.length - 30);
+        }
         results.roundHistory = newHistory;
         if(results == undefined){
             res.render('detailedstats', {results: null, error: 'Error, please try again'});
