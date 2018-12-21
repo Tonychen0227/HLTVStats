@@ -189,6 +189,7 @@ app.post('/matches', function (req, res) {
     HLTV.getMatches().then((answer) => {
         let matches = answer;
         if(matches == undefined){
+            requesting = false;
             res.render('matches', {matches: null, error: 'Error, please try again', team: teamParam, event: eventParam});
         } else {
             let output = [];
@@ -238,13 +239,14 @@ app.post('/matches', function (req, res) {
                     break;
                 }
             }
+            requesting = false;
             res.render('matches', {matches: matches, error: null, team: teamParam, event: eventParam});
         }
     }).catch(err => {
+        requesting = false;
         res.render('matches', {matches: null, error: 'Error, please try again', team: teamParam, event: eventParam});
-        console.log(err)
+        console.log(err);
     });
-    requesting = false;
 })
 
 app.post('/results', function (req, res) {
