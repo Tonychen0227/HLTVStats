@@ -192,9 +192,9 @@ app.post('/matches', function (req, res) {
     HLTV.getMatches().then((answer) => {
         let matches = answer;
         if(matches == undefined){
-            console.log('Lock released');
-            requesting = false;
             res.render('matches', {matches: null, error: 'Error, please try again', team: teamParam, event: eventParam});
+            console.log('Lock released due to no matches found');
+            requesting = false;
         } else {
             let output = [];
             for (i = 0; i < matches.length; i++) {
@@ -243,15 +243,15 @@ app.post('/matches', function (req, res) {
                     break;
                 }
             }
-            console.log('Lock released');
-            requesting = false;
             res.render('matches', {matches: matches, error: null, team: teamParam, event: eventParam});
+            console.log('Lock released after finding matches');
+            requesting = false;
         }
     }).catch(err => {
-        console.log('Lock released');
-        requesting = false;
         res.render('matches', {matches: null, error: 'Error, please try again', team: teamParam, event: eventParam});
         console.log(err);
+        console.log('Lock released due to error');
+        requesting = false;
     });
 })
 
