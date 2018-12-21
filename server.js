@@ -173,10 +173,13 @@ app.get('/matches/matchanalysis', function (req, res) {
 })  
 
 app.post('/matches', function (req, res) {
+    console.log('Checking for lock');
     if (requesting) {
         res.render('matches', {matches: null, error: 'Please try again later', team: null, event: null});
+        console.log('Clash discovered')
         return;
     } else {
+        console.log('Not detected, assigning lock ');
         requesting = true;
     }
     console.log('Requesting matches');
@@ -189,6 +192,7 @@ app.post('/matches', function (req, res) {
     HLTV.getMatches().then((answer) => {
         let matches = answer;
         if(matches == undefined){
+            console.log('Lock released');
             requesting = false;
             res.render('matches', {matches: null, error: 'Error, please try again', team: teamParam, event: eventParam});
         } else {
@@ -239,10 +243,12 @@ app.post('/matches', function (req, res) {
                     break;
                 }
             }
+            console.log('Lock released');
             requesting = false;
             res.render('matches', {matches: matches, error: null, team: teamParam, event: eventParam});
         }
     }).catch(err => {
+        console.log('Lock released');
         requesting = false;
         res.render('matches', {matches: null, error: 'Error, please try again', team: teamParam, event: eventParam});
         console.log(err);
