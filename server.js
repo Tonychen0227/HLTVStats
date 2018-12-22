@@ -244,7 +244,7 @@ app.post('/matches', function (req, res) {
                     }).catch(err => {
                         console.log(err);
                     })
-                } else {
+                } else if (!matches[i].live) {
                     break;
                 }
             }
