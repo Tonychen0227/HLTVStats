@@ -75,10 +75,8 @@
                         <td><%= matches[i].format %></td>
                         <td><%= matches[i].event.name %></td>
                         <td>
-                            <% if(matches[i].maps){ %>
-                                <% for(var k=0; k < matches[i].maps.length; k++) { %>
-                                    <span> <%= matches[i].maps[k] %> </span>
-                                <% } %>
+                            <% if(matches[i].map){ %>
+                                <span> <%= matches[i].map %> </span>
                             <% } else {%>
                                 <span> N/A </span>
                             <% } %>

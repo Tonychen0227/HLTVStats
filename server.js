@@ -11,8 +11,6 @@ var recentLogs = {};
 var connectedScorebots = [];
 var requestedScorebots = [];
 
-var requesting = false;
-
 HLTV.createInstance({hltvUrl: 'localhost', loadPage: https.get});
 
 app.set('view engine', 'ejs');
@@ -173,15 +171,6 @@ app.get('/matches/matchanalysis', function (req, res) {
 })  
 
 app.post('/matches', function (req, res) {
-    console.log('Checking for lock');
-    if (requesting) {
-        res.render('matches', {matches: null, error: 'Please try again later', team: null, event: null});
-        console.log('Clash discovered')
-        return;
-    } else {
-        console.log('Not detected, assigning lock ');
-        requesting = true;
-    }
     console.log('Requesting matches');
     let teamParam = req.body.teamname || "";
     let eventParam = req.body.eventname || "";
@@ -193,8 +182,6 @@ app.post('/matches', function (req, res) {
         let matches = answer;
         if(matches == undefined){
             res.render('matches', {matches: null, error: 'Error, please try again', team: teamParam, event: eventParam});
-            console.log('Lock released due to no matches found');
-            requesting = false;
         } else {
             let output = [];
             for (i = 0; i < matches.length; i++) {
@@ -221,37 +208,39 @@ app.post('/matches', function (req, res) {
             }
             for (var i = 0; i < matches.length; i++) {
                 let matchId = matches[i].id;
-                if (connectedScorebots.indexOf(matchId.toString()) == -1 && requestedScorebots.indexOf(matchId.toString()) != -1) {
-                    requestedScorebots.splice(requestedScorebots.indexOf(matchId.toString()), 1);
-                }
-                if (matches[i].live && requestedScorebots.indexOf(matches[i].id.toString())) {
+                if (matches[i].live && requestedScorebots.indexOf(matchId.toString()) == -1) {
+                    console.log(matchId.toString() + " added to requested scorebots")
                     requestedScorebots.push(matchId.toString());
-                    setTimeout(() => null, 2000);
-                    console.log("Trying to connect scorebot " + matchId)
-                    HLTV.connectToScorebot({id: matchId, onScoreboardUpdate: (data) => {
-                        scoreboardUpdate(matchId, data);
-                    }, onLogUpdate: (data) => { 
-                        logUpdate(matchId, data);
-                    }, onConnect: () => {
-                        console.log('Scorebot connected ' + matchId);
-                        connect(matchId);
-                    }, onDisconnect: () => {
-                        console.log('Scorebot disconnected ' + matchId);
-                        disconnect(matchId);
-                    }})
+                    HLTV.getMatch({id: matchId}).then(match => {
+                        if (match.hasScorebot) {
+                            console.log("Trying to connect scorebot " + matchId)
+                            HLTV.connectToScorebot({id: matchId, onScoreboardUpdate: (data) => {
+                                scoreboardUpdate(matchId, data);
+                            }, onLogUpdate: (data) => { 
+                                logUpdate(matchId, data);
+                            }, onConnect: () => {
+                                console.log('Scorebot connected ' + matchId);
+                                connect(matchId);
+                            }, onDisconnect: () => {
+                                console.log('Scorebot disconnected ' + matchId);
+                                disconnect(matchId);
+                            }})
+                        } else {
+                            console.log(matchId.toString() + " removed from requested scorebots")
+                            requestedScorebots.splice(requestedScorebots.indexOf(matchId.toString(), 1));
+                        }
+                    }).catch(err => {
+                        console.log(err);
+                    })
                 } else {
                     break;
                 }
             }
             res.render('matches', {matches: matches, error: null, team: teamParam, event: eventParam});
-            console.log('Lock released after finding matches');
-            requesting = false;
         }
     }).catch(err => {
         res.render('matches', {matches: null, error: 'Error, please try again', team: teamParam, event: eventParam});
         console.log(err);
-        console.log('Lock released due to error');
-        requesting = false;
     });
 })
 
