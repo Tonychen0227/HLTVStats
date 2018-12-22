@@ -11,6 +11,8 @@ var recentLogs = {};
 var connectedScorebots = [];
 var requestedScorebots = [];
 
+var scorebotLock = false;
+
 HLTV.createInstance({hltvUrl: 'localhost', loadPage: https.get});
 
 app.set('view engine', 'ejs');
@@ -171,6 +173,14 @@ app.get('/matches/matchanalysis', function (req, res) {
 })  
 
 app.post('/matches', function (req, res) {
+    if (scorebotLock) {
+        console.log('Procedure blocked')
+        res.render('matches', {matches: null, error: 'Server difficulties, try again in a few seconds', team: null, event: null});
+        return;
+    } else {
+        console.log('Acquire lock');
+        scorebotLock = true;
+    }
     console.log('Requesting matches');
     let teamParam = req.body.teamname || "";
     let eventParam = req.body.eventname || "";
@@ -181,6 +191,8 @@ app.post('/matches', function (req, res) {
     HLTV.getMatches().then((answer) => {
         let matches = answer;
         if(matches == undefined){
+            console.log('Releasing lock, no matches found')
+            scorebotLock = false;
             res.render('matches', {matches: null, error: 'Error, please try again', team: teamParam, event: eventParam});
         } else {
             let output = [];
@@ -236,9 +248,13 @@ app.post('/matches', function (req, res) {
                     break;
                 }
             }
+            console.log('Releasing lock, done finding matches')
+            scorebotLock = false;
             res.render('matches', {matches: matches, error: null, team: teamParam, event: eventParam});
         }
     }).catch(err => {
+        console.log('Releasing lock, error finding matches')
+        scorebotLock = false;
         res.render('matches', {matches: null, error: 'Error, please try again', team: teamParam, event: eventParam});
         console.log(err);
     });
