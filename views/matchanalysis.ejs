@@ -18,13 +18,30 @@
                 <input type="submit" class="ghost-button" value="Back to Matches">
               </form>
           </div>
-      <h3> Stats & Analysis </h3> 
-        <% if(id !== null){ %>
-            <p><%= id %></p>
+      <h3 align="center"> Stats & Analysis </h3> 
+      <% if(match !== null){ %>
+        <h3 align="center"> <%=match.team1.name%> vs <%=match.team2.name%> - <%= match.event.name %> </h3>
+        <h4 align="center"> Maps: 
+        <% for(var i=0; i < match.maps.length; i++) { %>
+          <% if(match.maps[i].statsId){ %>
+            <a href="../results/detailedstats?id=<%=match.maps[i].statsId%>"><span> <%=match.maps[i].name%></span></a>
+          <% } else { %>
+            <span> <%=match.maps[i].name%></span>
           <% } %>
-          <% if(error !== null){ %>
-            <p><%= error %></p>
+          <% for(var k=0; k < match.maps[i].result.length; k++) { %>
+            <% if(match.maps[i].result[k] == ' '){ %>
+              <span> (<%= match.maps[i].result.substring(0, k).trim()%>) </span>
+              <% break; %>
+            <% } %>
           <% } %>
+        <% } %>
+        </h4>
+      <% } else { %>
+        <p align="center"> No match found </p>
+      <% } %>
+      <% if(error !== null){ %>
+        <p><%= error %></p>
+      <% } %>
     </fieldset>
   </body>
 </html>

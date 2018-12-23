@@ -149,6 +149,7 @@ function connect(id) {
         connectedScorebots.push(id.toString());
     }
 }
+
 app.get('/matches/scorebot', function (req, res) {
     console.log('Requesting updated data for ' + req.query.id);
     HLTV.getMatch({id: req.query.id}).then(match => {
@@ -170,20 +171,104 @@ app.get('/matches/scorebot', function (req, res) {
 
 app.get('/matches/matchanalysis', function (req, res) {
     console.log('Requesting analysis for ' + req.query.id);
-    HLTV.getMatch({id: matchId}).then(match => {
-        let players;
-        let team1 = match.team1;
-        let team2 = match.team2;
-        if (team1 && team1.id) {
-
+    HLTV.getMatch({id: req.query.id}).then(async match => {
+        if (match.team1 == undefined || match.team2 == undefined) {
+            res.render('matchanalysis', {match: null, team1: null, team2: null, team1players: null, team2players: null, error: 'Match does not have both teams determined'});
         }
-        if (team2 && team2.id) {
-
+        let team1Promise = undefined;
+        let team2Promise = undefined;
+        let team1playerPromise = undefined;
+        let team2playerPromise = undefined;
+        if (match.team1 != undefined && match.team1.id != undefined) {
+            team1Promise = new Promise(function(resolve, reject) {
+                let output = {};
+                console.log('Looking up team ' + match.team1.id);
+                HLTV.getTeam({id: match.team1.id}).then(team => {
+                    output['name'] = team.name;
+                    output['players'] = team.players;
+                    output['rank'] = team.rank;
+                    output['recentResults'] = team.recentResults;
+                    output['rankingDevelopment'] = team.rankingDevelopment;
+                    output['mapStatistics'] = team.mapStatistics;
+                    resolve(output);
+                }).catch(err => {
+                    console.log(err);
+                    resolve(output);
+                })
+            })
         }
-        res.render('matchanalysis', {id: req.query.id, teamPlayers: , teamerror: 'An error occurred'});
+        if (match.team2 != undefined && match.team2.id != undefined) {
+            team2Promise = new Promise(function(resolve, reject) {
+                let output = {};
+                console.log('Looking up team ' + match.team2.id);
+                HLTV.getTeam({id: match.team2.id}).then(team => {
+                    output['name'] = team.name;
+                    output['players'] = team.players;
+                    output['rank'] = team.rank;
+                    output['recentResults'] = team.recentResults;
+                    output['rankingDevelopment'] = team.rankingDevelopment;
+                    output['mapStatistics'] = team.mapStatistics;
+                    resolve(output);
+                }).catch(err => {
+                    console.log(err);
+                    resolve(output);
+                })
+            })
+        }
+        if (match.players != undefined) {
+            team1playerPromise = new Promise(function(resolve, reject) {
+                let players = match.players.team1;
+                let output = [];
+                for (var i = 0; i < players.length; i++) {
+                    player = players[i]
+                    if (player.id) {
+                        let stats = {};
+                        console.log('Looking up player ' + player.id);
+                        HLTV.getPlayerStats({id: player.id}).then(data => {
+                            stats['name'] = data.ign;
+                            stats['maps'] = data.statistics.mapsPlayed;
+                            stats['kdRatio'] = data.statistics.kdRatio;
+                            stats['ADR'] = data.statistics.damagePerRound;
+                            stats['rating'] = data.statistics.rating;
+                            output.push(stats);
+                        })
+                    } else {
+                        output.push(player.ign);
+                    }
+                }
+                resolve(output);
+            });
+            team2playerPromise = new Promise(function(resolve, reject) {
+                let players = match.players.team2;
+                let output = [];
+                for (var i = 0; i < players.length; i++) {
+                    player = players[i]
+                    if (player.id) {
+                        let stats = {};
+                        console.log('Looking up player ' + player.id);
+                        HLTV.getPlayerStats({id: player.id}).then(data => {
+                            stats['name'] = data.ign;
+                            stats['maps'] = data.statistics.mapsPlayed;
+                            stats['kdRatio'] = data.statistics.kdRatio;
+                            stats['ADR'] = data.statistics.damagePerRound;
+                            stats['rating'] = data.statistics.rating;
+                            output.push(stats);
+                        })
+                    } else {
+                        output.push(player.ign);
+                    }
+                }
+                resolve(output);
+            });
+        }
+        Promise.all([team1Promise, team2Promise, team1playerPromise, team2playerPromise]).then(function(values) {
+            console.log(values);
+            console.log('rendering');
+            res.render('matchanalysis', {match: match, team1: values[0], team2: values[1], team1players: values[2], team2players: values[3], error: null});
+        })
     }).catch(err => {
         console.log(err)
-        res.render('matchanalysis', {id: req.query.id, error: 'An error occurred'});
+        res.render('matchanalysis', {match: null, team1: null, team2: null, team1players: null, team2players: null, error: 'An error occurred'});
     })
 })
 
