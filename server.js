@@ -10,6 +10,7 @@ var recentUpdates = {};
 var recentLogs = {};
 var connectedScorebots = [];
 var requestedScorebots = [];
+var savedAnalyses = {};
 
 var scorebotLock = false;
 
@@ -169,8 +170,22 @@ app.get('/matches/scorebot', function (req, res) {
 
 app.get('/matches/matchanalysis', function (req, res) {
     console.log('Requesting analysis for ' + req.query.id);
-    res.render('matchanalysis', {id: req.query.id, error: null});
-})  
+    HLTV.getMatch({id: matchId}).then(match => {
+        let players;
+        let team1 = match.team1;
+        let team2 = match.team2;
+        if (team1 && team1.id) {
+
+        }
+        if (team2 && team2.id) {
+
+        }
+        res.render('matchanalysis', {id: req.query.id, teamPlayers: , teamerror: 'An error occurred'});
+    }).catch(err => {
+        console.log(err)
+        res.render('matchanalysis', {id: req.query.id, error: 'An error occurred'});
+    })
+})
 
 app.post('/matches', function (req, res) {
     if (scorebotLock) {
@@ -245,7 +260,6 @@ app.post('/matches', function (req, res) {
                         console.log(err);
                     })
                 } else if (!matches[i].live) {
-                    break;
                 }
             }
             console.log('Releasing lock, done finding matches')
