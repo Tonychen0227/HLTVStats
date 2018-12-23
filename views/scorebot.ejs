@@ -40,6 +40,17 @@
             <% } %>
           <% } %>
           </h4>
+          <% if(match.vetoes){ %>
+            <h6 align="center">
+            <% for(var i=0; i < match.vetoes.length; i++) { %>
+              <% if(match.vetoes[i].team){ %>
+                <span> <%=match.vetoes[i].team.name%> </span>
+              <% } %>
+              <span> <%=match.vetoes[i].type%>: <%=match.vetoes[i].map%></span>
+              <br>
+            <% } %>
+          </h6>
+          <% } %>
         <% } else { %>
           <p align="center"> No match found </p>
         <% } %>
