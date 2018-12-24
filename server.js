@@ -415,8 +415,10 @@ app.get('/results', function (req, res) {
 
 app.post('/matchresults', function (req, res) {
     let teamParam = req.body.teamname.toUpperCase() || "";
+    let pageParam = req.body.pages || 1;
     let eventParam = req.body.eventname.toUpperCase() || "";
-    HLTV.getResults({pages: 1}).then((answer) => {
+    console.log('Requesting match results ' + teamParam + eventParam + pageParam);
+    HLTV.getResults({pages: pageParam}).then((answer) => {
         let results = answer
         if(results == undefined){
             res.render('matchresults', {results: null, error: 'Error, please try again', team: teamParam, event: eventParam});

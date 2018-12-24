@@ -23,6 +23,16 @@
             <br>
             <form action="/matchresults" method="post">
                 <div class="fields" align="center">
+                    <label for="pages"> How many pages? </label>
+                    <select id="pages" name="pages" align="center">
+                        <% var options = []; %>
+                        <option value="1" selected="selected">1 page (Default)</option>
+                        <% for(var i = 2; i <= 5; i++) { %>
+                            <option value='<%= i %>'><%= i %> pages </option>
+                        <% } %>
+                    </select>
+                </div>
+                <div class="fields" align="center">
                     <label for="teamname"> Filter by team: </label>
                     <input type="teamname" name="teamname">
                     <label for="eventname"> Filter by event: </label>
