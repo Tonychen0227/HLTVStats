@@ -414,8 +414,8 @@ app.get('/results', function (req, res) {
 })
 
 app.post('/matchresults', function (req, res) {
-    let teamParam = req.body.teamname || "";
-    let eventParam = req.body.eventname || "";
+    let teamParam = req.body.teamname.toUpperCase() || "";
+    let eventParam = req.body.eventname.toUpperCase() || "";
     HLTV.getResults({pages: 1}).then((answer) => {
         let results = answer
         if(results == undefined){
@@ -427,6 +427,7 @@ app.post('/matchresults', function (req, res) {
                 let team2 = results[i].team2.name.toUpperCase();
                 let event = results[i].event.name.toUpperCase();
                 results[i].date = moment(results[i].date).tz('America/Vancouver').format('Y M-D ha z');
+                console.log(teamParam, eventParam, team1, team2, event);
                 if (((team1.indexOf(teamParam) != -1 || 
                 team2.indexOf(teamParam) != -1) && teamParam != "")||
                 (event.indexOf(eventParam) != -1 && eventParam != "")) {
