@@ -35,8 +35,18 @@
             <% } %>
           <% } %>
         <% } %>
-        <h4 align="center"> <%= match.additionalInfo %> </h4>
         </h4>
+        <h4 align="center"> <%= match.additionalInfo %> </h4>
+        <% if(match.vetoes){ %>
+          <h6 align="center">
+          <% for(var i=0; i < match.vetoes.length; i++) { %>
+            <% if(match.vetoes[i].team){ %>
+              <span> <%=match.vetoes[i].team.name%> </span>
+            <% } %>
+            <span> <%=match.vetoes[i].type%>: <%=match.vetoes[i].map%></span>
+            <br>
+          <% } %>
+        <% } %>
         <% if(match.headToHead) { %>
           <h4 align="center"> Head to head (90 days) </h4>
           <table>
@@ -76,6 +86,7 @@
                 </tr>
               <% } %>
             </table>
+            <h5 align="center"> Average Rating: <%= averageTeam1 %> </h5>
             <% } %>
             <h4 align="center"> <%= team1.name %> Matches </h4>
             <% if(team1.recentResults != undefined) { %>
@@ -137,6 +148,7 @@
                 </tr>
               <% } %>
             </table>
+            <h5 align="center"> Average Rating: <%= averageTeam2 %> </h5>
             <% } %>
             <h4 align="center"> <%= team2.name %> Matches </h4>
             <% if(team2.recentResults != undefined) { %>

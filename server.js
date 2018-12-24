@@ -174,7 +174,7 @@ app.get('/matches/matchanalysis', function (req, res) {
     HLTV.getMatch({id: req.query.id}).then(async match => {
         match.date = moment(match.date).tz('America/Vancouver').format('Y M-D ha z');
         if (match.team1 == undefined || match.team2 == undefined) {
-            res.render('matchanalysis', {match: null, team1: null, team2: null, team1players: null, team2players: null, error: 'Match does not have both teams determined'});
+            res.render('matchanalysis', {match: null, team1: null, team2: null, team1players: null, team2players: null, averageTeam1: 0, averageTeam2: 0, error: 'Match does not have both teams determined'});
         }
         if (match.headToHead) {
             for (var i = 0; i < match.headToHead.length; i++) {
@@ -267,7 +267,15 @@ app.get('/matches/matchanalysis', function (req, res) {
         }
         Promise.all([team1Promise, team2Promise, team1playerPromise, team2playerPromise]).then(function(values) {
             let tempPlayerList = [];
+            let averageTeam1 = 0;
+            let team1Counter = 0;
+            let averageTeam2 = 0;
+            let team2Counter = 0;
             for (var i = 0; i < values[2].length; i++) {
+                if (values[2][i].rating) {
+                    averageTeam1 = averageTeam1 + parseFloat(values[2][i].rating);
+                    team1Counter = team1Counter + 1;
+                }
                 value = values[2][i];
                 if (tempPlayerList.length == 0) {
                     tempPlayerList.push(value);
@@ -287,6 +295,10 @@ app.get('/matches/matchanalysis', function (req, res) {
             values.splice(2, 1, tempPlayerList);
             tempPlayerList = [];
             for (var i = 0; i < values[3].length; i++) {
+                if (values[3][i].rating) {
+                    averageTeam2 = averageTeam2 + parseFloat(values[3][i].rating);
+                    team2Counter = team2Counter + 1;
+                }
                 value = values[3][i];
                 if (tempPlayerList.length == 0) {
                     tempPlayerList.push(value);
@@ -304,11 +316,11 @@ app.get('/matches/matchanalysis', function (req, res) {
                 }
             }
             values.splice(3, 1, tempPlayerList);
-            res.render('matchanalysis', {match: match, team1: values[0], team2: values[1], team1players: values[2], team2players: values[3], error: null});
+            res.render('matchanalysis', {match: match, team1: values[0], team2: values[1], team1players: values[2], team2players: values[3], averageTeam1: (averageTeam1/team1Counter).toFixed(2), averageTeam2: (averageTeam2/team2Counter).toFixed(2), error: null});
         })
     }).catch(err => {
         console.log(err)
-        res.render('matchanalysis', {match: null, team1: null, team2: null, team1players: null, team2players: null, error: 'An error occurred'});
+        res.render('matchanalysis', {match: null, team1: null, team2: null, team1players: null, team2players: null, averageTeam1: 0, averageTeam2: 0, error: 'An error occurred'});
     })
 })
 
