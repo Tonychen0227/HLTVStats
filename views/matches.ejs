@@ -63,7 +63,7 @@
             <tr>
                 <th>Date</th>
                 <th>Matchup</th>
-                <th>Format</th>
+                <th>Map/Format</th>
                 <th>Tournament</th>
                 <th>Analysis</th>
             </tr>
@@ -72,7 +72,11 @@
                     <tr>
                         <td><%= matches[i].date %></td>
                         <td><%= matches[i].team1.name %> vs <%= matches[i].team2.name %></td>
-                        <td><%= matches[i].format %></td>
+                        <% if(matches[i].map) { %>
+                            <td><%= matches[i].map %></td>
+                        <% } else { %>
+                            <td><%= matches[i].format %></td>
+                        <% } %>
                         <td><%= matches[i].event.name %></td>
                         <td><a href="matches/matchanalysis?id=<%= matches[i].id %>"> Analysis </a></td>
                     </tr>
