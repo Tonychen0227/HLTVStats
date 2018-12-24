@@ -1,16 +1,15 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const request = require('request');
-const argv = require('yargs').argv;
 const { HLTV } = require('hltv');
 const https = require("https");
+const moment = require("moment");
+require('moment-timezone');
 
 var recentUpdates = {};
 var recentLogs = {};
 var connectedScorebots = [];
 var requestedScorebots = [];
-var savedAnalyses = {};
 
 var scorebotLock = false;
 
@@ -48,7 +47,7 @@ app.get('/', function (req, res) {
     } 
     onemonthago = yyyy + '-' + mm + '-' + dd;
     HLTV.getPlayerRanking({startDate: onemonthago, endDate: today}).then(answer => {
-        res.render('landing', {rankings: answer})
+        res.render('landing', {rankings: answer});
     })
 })
 
@@ -153,6 +152,7 @@ function connect(id) {
 app.get('/matches/scorebot', function (req, res) {
     console.log('Requesting updated data for ' + req.query.id);
     HLTV.getMatch({id: req.query.id}).then(match => {
+        match.date = moment(match.date).tz('America/Vancouver').format('Y M-D ha z');
         if (connectedScorebots.indexOf(req.query.id) != -1) {
             if (recentUpdates[req.query.id] && recentLogs[req.query.id]) {
                 res.render('scorebot', {match: match, update: recentUpdates[req.query.id], log: recentLogs[req.query.id], error: null});
@@ -172,8 +172,20 @@ app.get('/matches/scorebot', function (req, res) {
 app.get('/matches/matchanalysis', function (req, res) {
     console.log('Requesting analysis for ' + req.query.id);
     HLTV.getMatch({id: req.query.id}).then(async match => {
+        match.date = moment(match.date).tz('America/Vancouver').format('Y M-D ha z');
         if (match.team1 == undefined || match.team2 == undefined) {
             res.render('matchanalysis', {match: null, team1: null, team2: null, team1players: null, team2players: null, error: 'Match does not have both teams determined'});
+        }
+        if (match.headToHead) {
+            for (var i = 0; i < match.headToHead.length; i++) {
+                if (moment().diff(moment(match.headToHead[i].date), 'days') > 90) {
+                    match.headToHead[i].date = moment(match.headToHead[i].date).format('M-D');
+                    match.headToHead.splice(i, match.headToHead.length - i)
+                    break;
+                } else {
+                    match.headToHead[i].date = moment(match.headToHead[i].date).format('M-D');
+                }
+            }
         }
         let team1Promise = undefined;
         let team2Promise = undefined;
@@ -188,7 +200,6 @@ app.get('/matches/matchanalysis', function (req, res) {
                     output['players'] = team.players;
                     output['rank'] = team.rank;
                     output['recentResults'] = team.recentResults;
-                    output['rankingDevelopment'] = team.rankingDevelopment;
                     output['mapStatistics'] = team.mapStatistics;
                     resolve(output);
                 }).catch(err => {
@@ -206,7 +217,6 @@ app.get('/matches/matchanalysis', function (req, res) {
                     output['players'] = team.players;
                     output['rank'] = team.rank;
                     output['recentResults'] = team.recentResults;
-                    output['rankingDevelopment'] = team.rankingDevelopment;
                     output['mapStatistics'] = team.mapStatistics;
                     resolve(output);
                 }).catch(err => {
@@ -223,17 +233,14 @@ app.get('/matches/matchanalysis', function (req, res) {
                     player = players[i]
                     if (player.id) {
                         let stats = {};
-                        console.log('Looking up player ' + player.id);
                         HLTV.getPlayerStats({id: player.id}).then(data => {
                             stats['name'] = data.ign;
-                            stats['maps'] = data.statistics.mapsPlayed;
-                            stats['kdRatio'] = data.statistics.kdRatio;
                             stats['ADR'] = data.statistics.damagePerRound;
                             stats['rating'] = data.statistics.rating;
                             output.push(stats);
                         })
                     } else {
-                        output.push(player.ign);
+                        output.push(player.name);
                     }
                 }
                 resolve(output);
@@ -245,25 +252,58 @@ app.get('/matches/matchanalysis', function (req, res) {
                     player = players[i]
                     if (player.id) {
                         let stats = {};
-                        console.log('Looking up player ' + player.id);
                         HLTV.getPlayerStats({id: player.id}).then(data => {
                             stats['name'] = data.ign;
-                            stats['maps'] = data.statistics.mapsPlayed;
-                            stats['kdRatio'] = data.statistics.kdRatio;
                             stats['ADR'] = data.statistics.damagePerRound;
                             stats['rating'] = data.statistics.rating;
                             output.push(stats);
                         })
                     } else {
-                        output.push(player.ign);
+                        output.push(player.name);
                     }
                 }
                 resolve(output);
             });
         }
         Promise.all([team1Promise, team2Promise, team1playerPromise, team2playerPromise]).then(function(values) {
-            console.log(values);
-            console.log('rendering');
+            let tempPlayerList = [];
+            for (var i = 0; i < values[2].length; i++) {
+                value = values[2][i];
+                if (tempPlayerList.length == 0) {
+                    tempPlayerList.push(value);
+                    continue;
+                }
+                for (var k = 0; k < tempPlayerList.length; k++) {
+                    if (tempPlayerList[k].rating == undefined || value.rating > tempPlayerList[k].rating) {
+                        tempPlayerList.splice(k, 0, value);
+                        break;
+                    }
+                    if (k == tempPlayerList.length - 1) {
+                        tempPlayerList.push(value);
+                        break;
+                    }
+                }
+            }
+            values.splice(2, 1, tempPlayerList);
+            tempPlayerList = [];
+            for (var i = 0; i < values[3].length; i++) {
+                value = values[3][i];
+                if (tempPlayerList.length == 0) {
+                    tempPlayerList.push(value);
+                    continue;
+                }
+                for (var k = 0; k < tempPlayerList.length; k++) {
+                    if (tempPlayerList[k].rating == undefined || value.rating > tempPlayerList[k].rating) {
+                        tempPlayerList.splice(k, 0, value);
+                        break;
+                    }
+                    if (k == tempPlayerList.length - 1) {
+                        tempPlayerList.push(value);
+                        break;
+                    }
+                }
+            }
+            values.splice(3, 1, tempPlayerList);
             res.render('matchanalysis', {match: match, team1: values[0], team2: values[1], team1players: values[2], team2players: values[3], error: null});
         })
     }).catch(err => {
@@ -300,6 +340,7 @@ app.post('/matches', function (req, res) {
                 let team1 = "";
                 let team2 = "";
                 let event = "";
+                matches[i].date = moment(matches[i].date).tz('America/Vancouver').format('Y M-D ha z');
                 if (matches[i].team1) {
                     team1 = matches[i].team1.name.toUpperCase() || "";
                 }
@@ -359,51 +400,33 @@ app.post('/matches', function (req, res) {
     });
 })
 
-app.post('/results', function (req, res) {
-    console.log('Requesting results');
+app.get('/results', function (req, res) {
+    if (req.query.id == undefined) {
+        res.render('results', {match: null, error: 'ID is missing'});
+        return;
+    }
+    console.log('Requesting match ' + req.query.id);
+    matchId = req.query.id;
+    HLTV.getMatch ({id: matchId}).then(match => {
+        match.date = moment(match.date).tz('America/Vancouver').format('Y M-D ha z');
+        res.render('results', {result: match, error: null});
+    });
+})
+
+app.post('/matchresults', function (req, res) {
     let teamParam = req.body.teamname || "";
-    let daysParam = req.body.days || 1;
     let eventParam = req.body.eventname || "";
-
-    teamParam = teamParam.toUpperCase();
-    eventParam = eventParam.toUpperCase();
-
-    let today = new Date();
-    let dd = today.getDate() + 1;
-    let mm = today.getMonth()+1; //January is 0!
-    let yyyy = today.getFullYear();
-    if(dd<10) {
-        dd = '0'+dd
-    } 
-    if(mm<10) {
-        mm = '0'+mm
-    } 
-    today = yyyy + '-' + mm + '-' + dd;
-
-    let xdaysago = new Date();
-    xdaysago.setDate(xdaysago.getDate() - daysParam);
-    dd = xdaysago.getDate();
-    mm = xdaysago.getMonth()+1;
-    yyyy = xdaysago.getFullYear();
-    if(dd<10) {
-        dd = '0'+dd
-    } 
-    if(mm<10) {
-        mm = '0'+mm
-    } 
-    xdaysago = yyyy + '-' + mm + '-' + dd;
-
-    HLTV.getMatchesStats({startDate: xdaysago, endDate: today}).then((answer) => {
-        console.log(xdaysago, today);
+    HLTV.getResults({pages: 1}).then((answer) => {
         let results = answer
         if(results == undefined){
-            res.render('results', {results: null, error: 'Error, please try again', team: teamParam, event: eventParam});
+            res.render('matchresults', {results: null, error: 'Error, please try again', team: teamParam, event: eventParam});
         } else {
             let output = [];
             for (i = 0; i < results.length; i++) {
                 let team1 = results[i].team1.name.toUpperCase();
                 let team2 = results[i].team2.name.toUpperCase();
                 let event = results[i].event.name.toUpperCase();
+                results[i].date = moment(results[i].date).tz('America/Vancouver').format('Y M-D ha z');
                 if (((team1.indexOf(teamParam) != -1 || 
                 team2.indexOf(teamParam) != -1) && teamParam != "")||
                 (event.indexOf(eventParam) != -1 && eventParam != "")) {
@@ -413,10 +436,10 @@ app.post('/results', function (req, res) {
             if (teamParam != "" || eventParam != "") {
                 results = output;
             }
-            res.render('results', {results: results, error: null, team: teamParam, event: eventParam});
+            res.render('matchresults', {results: results, error: null, team: teamParam, event: eventParam});
         }
     }).catch(err => {
-        res.render('results', {results: null, error: 'Error, please try again', team: teamParam, event: eventParam});
+        res.render('matchresults', {results: null, error: 'Error, please try again', team: teamParam, event: eventParam});
         console.log(err)
     });
 })

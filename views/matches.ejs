@@ -34,7 +34,7 @@
                         <th>Format</th>
                         <th>Tournament</th>
                         <th>Maps</th>
-                        <th>Scorebot</th>
+                        <th>Analysis/Scorebot</th>
                     </tr>
                     <% for(var i=0; i < matches.length; i++) { %>
                         <% if(matches[i].live){ %>
@@ -51,7 +51,8 @@
                                         <span> No Maps Found </span>
                                     <% } %>
                                 </td>
-                                <td><a href="matches/scorebot?id=<%= matches[i].id %>">Scorebot</a></td>
+                                <td><a href="matches/matchanalysis?id=<%= matches[i].id %>">Analysis</a>
+                                    <a href="matches/scorebot?id=<%= matches[i].id %>">Scorebot</a></td>
                             </tr>
                         <% } %>
                     <% } %>
@@ -64,23 +65,15 @@
                 <th>Matchup</th>
                 <th>Format</th>
                 <th>Tournament</th>
-                <th>Maps</th>
                 <th>Analysis</th>
             </tr>
             <% for(var i=0; i < matches.length; i++) { %>
                 <% if(matches[i].team1 && matches[i].team2 && matches[i].event && !matches[i].live){ %>
                     <tr>
-                        <td><%= 1900 + new Date(matches[i].date).getYear() %>-<%= 1 + new Date(matches[i].date).getMonth() %>-<%= new Date(matches[i].date).getDate() %></td>
+                        <td><%= matches[i].date %></td>
                         <td><%= matches[i].team1.name %> vs <%= matches[i].team2.name %></td>
                         <td><%= matches[i].format %></td>
                         <td><%= matches[i].event.name %></td>
-                        <td>
-                            <% if(matches[i].map){ %>
-                                <span> <%= matches[i].map %> </span>
-                            <% } else {%>
-                                <span> N/A </span>
-                            <% } %>
-                        </td>
                         <td><a href="matches/matchanalysis?id=<%= matches[i].id %>"> Analysis </a></td>
                     </tr>
                 <% } %>

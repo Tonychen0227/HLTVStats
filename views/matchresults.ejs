@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Match Results</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
+  </head>
+  <body>
+    <fieldset>
+        <h1 align="center"> Match Results </h1>
+        <div class="container">
+            <form action="/" method="get">
+                <input type="submit" class="ghost-button" value="Back to Home">
+            </form>
+            <br>
+            <form action="/matchresults" method="post">
+                <div class="fields" align="center">
+                    <label for="teamname"> Filter by team: </label>
+                    <input type="teamname" name="teamname" value="<%= team %>">
+                    <label for="eventname"> Filter by event: </label>
+                    <input type="eventname" name="eventname" value="<%= event %>">
+                </div>
+                <input type="submit" class="ghost-button" value="Filter Results">
+            </form>
+        </div>
+    <h3 align="center"> MATCH RESULTS </h3>
+    <% if(results !== null){ %>
+        <table>
+            <tr>
+                <th> Date </th>
+                <th> Matchup </th>
+                <th width="250px"> Tournament </th>
+                <th> Map </th>
+                <th width="60px"> Score </th>
+                <th> Details </th>
+            </tr>
+            <% for(var i=0; i < results.length; i++) { %>
+                <% if(results[i].team1 && results[i].team2 && results[i].event && !results[i].live){ %>
+                    <tr>
+                        <td><%= results[i].date %></td>
+                        <td><%= results[i].team1.name %> vs <%= results[i].team2.name %></td>
+                        <td width="250px"><%= results[i].event.name %></td>
+                        <% if(results[i].map) { %>
+                            <td><%= results[i].map %></td>
+                        <% } else { %>
+                            <td><%= results[i].format %></td>
+                        <% } %>
+                        <td width="75px"><%= results[i].result %></td>
+                        <td><a href="results?id=<%= results[i].id %>"> Details </a></td>
+                    </tr>
+                <% } else {%>
+                <% } %>
+            <% } %>
+        </table>
+    <% } %>
+    <% if(error !== null){ %>
+        <p><%= error %></p>
+    <% } %>
+  </body>
+</html>

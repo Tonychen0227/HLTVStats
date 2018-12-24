@@ -25,6 +25,7 @@
       
         <% if(match !== null){ %>
           <h3 align="center"> <%=match.team1.name%> vs <%=match.team2.name%> - <%= match.event.name %> </h3>
+          <h4 align="center"> <%=match.date%> </h4>
           <h4 align="center"> Maps: 
           <% for(var i=0; i < match.maps.length; i++) { %>
             <% if(match.maps[i].statsId){ %>

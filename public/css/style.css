@@ -140,3 +140,8 @@ body {
 input {
   width: 100px;
 }
+
+.center {
+  margin: auto;
+  width: 700px;
+}

@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Test</title>
+    <title>Match Analysis</title>
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
   </head>
@@ -18,13 +18,13 @@
                 <input type="submit" class="ghost-button" value="Back to Matches">
               </form>
           </div>
-      <h3 align="center"> Stats & Analysis </h3> 
       <% if(match !== null){ %>
         <h3 align="center"> <%=match.team1.name%> vs <%=match.team2.name%> - <%= match.event.name %> </h3>
+        <h4 align="center"> <%= match.date %></h4>
         <h4 align="center"> Maps: 
         <% for(var i=0; i < match.maps.length; i++) { %>
           <% if(match.maps[i].statsId){ %>
-            <a href="../results/detailedstats?id=<%=match.maps[i].statsId%>"><span> <%=match.maps[i].name%></span></a>
+            <span> <%=match.maps[i].name%></span>
           <% } else { %>
             <span> <%=match.maps[i].name%></span>
           <% } %>
@@ -35,10 +35,152 @@
             <% } %>
           <% } %>
         <% } %>
+        <h4 align="center"> <%= match.additionalInfo %> </h4>
         </h4>
+        <% if(match.headToHead) { %>
+          <h4 align="center"> Head to head (90 days) </h4>
+          <table>
+            <tr>
+              <th>Date</th>
+              <th>Map</th>
+              <th>Result</th>
+            </tr>
+            <% for(var i = 0; i < match.headToHead.length; i++) { %>
+              <tr>
+                <td><%=match.headToHead[i].date%></td>
+                <td><%=match.headToHead[i].map%></td>
+                <td><%=match.headToHead[i].result%></td>
+              </tr>
+            <% } %>
+          </table>
+        <% } %>
       <% } else { %>
         <p align="center"> No match found </p>
       <% } %>
+      <div class="center">
+        <div style="float: left; width: 350px;">
+          <% if(team1 != undefined) { %>
+            <h4 align="center"> <%= team1.name %>(#<%= team1.rank %>) Players </h4>
+            <% if(team1players != undefined) { %>
+            <table>
+              <tr>
+                <th>Name</th>
+                <th>Maps</th>
+                <th>Rating</th>
+              </tr>
+              <% for(var i = 0; i < team1players.length; i++) { %>
+                <tr>
+                  <td><%=team1players[i].name%></td>
+                  <td><%=team1players[i].ADR%></td>
+                  <td><%=team1players[i].rating%></td>
+                </tr>
+              <% } %>
+            </table>
+            <% } %>
+            <h4 align="center"> <%= team1.name %> Matches </h4>
+            <% if(team1.recentResults != undefined) { %>
+              <table>
+                <tr>
+                  <th>Page</th>
+                  <th>Vs</th>
+                  <th>Result</th>
+                </tr>
+                <% for(var i = 0; i < team1.recentResults.length; i++) { %>
+                  <tr>
+                    <% if(team1.recentResults != undefined) { %>
+                      <td><a href="/results?id=<%=team1.recentResults[i].matchID%>"> Yes </a></td>
+                    <% }  else { %>
+                      <td>No :(</td>
+                    <% } %>
+                    <td><%=team1.recentResults[i].enemyTeam.name%></td>
+                    <td><%=team1.recentResults[i].result%></td>
+                  </tr>
+                <% } %>
+              </table>
+            <% } %>
+            <h4 align="center"> <%= team1.name %> Maps </h4>
+            <% if(team1.mapStatistics != undefined) { %>
+              <table>
+                <tr>
+                  <th>Map</th>
+                  <th>Matches</th>
+                  <th>Winrate</th>
+                  <th>CT / T</th>
+                </tr>
+                <% for(var key in team1.mapStatistics) { %>
+                  <tr>
+                    <td><%=key%></td>
+                    <td><%=team1.mapStatistics[key].timesPlayed%></td>
+                    <td><%=team1.mapStatistics[key].winningPercentage%></td>
+                    <td><%=team1.mapStatistics[key].ctWinningPercentage%> / <%=team1.mapStatistics[key].tWinningPercentage%></td>
+                  </tr>
+                <% } %>
+              </table>
+            <% } %>
+          <% } %>
+        </div>
+        <div style="float: right; width: 350px;">
+          <% if(team2 != undefined) { %>
+            <h4 align="center"> <%= team2.name %>(#<%= team2.rank %>) Players </h4>
+            <% if(team2players != undefined) { %>
+            <table>
+              <tr>
+                <th>Name</th>
+                <th>Maps</th>
+                <th>Rating</th>
+              </tr>
+              <% for(var i = 0; i < team2players.length; i++) { %>
+                <tr>
+                  <td><%=team2players[i].name%></td>
+                  <td><%=team2players[i].ADR%></td>
+                  <td><%=team2players[i].rating%></td>
+                </tr>
+              <% } %>
+            </table>
+            <% } %>
+            <h4 align="center"> <%= team2.name %> Matches </h4>
+            <% if(team2.recentResults != undefined) { %>
+              <table>
+                <tr>
+                  <th>Page</th>
+                  <th>Vs</th>
+                  <th>Result</th>
+                </tr>
+                <% for(var i = 0; i < team2.recentResults.length; i++) { %>
+                  <tr>
+                      <% if(team2.recentResults != undefined) { %>
+                        <td><a href="/results?id=<%=team2.recentResults[i].matchID%>"> Yes </a></td>
+                      <% }  else { %>
+                        <td>No :(</td>
+                      <% } %>
+                    <td><%=team2.recentResults[i].enemyTeam.name%></td>
+                    <td><%=team2.recentResults[i].result%></td>
+                  </tr>
+                <% } %>
+              </table>
+            <% } %>
+            <h4 align="center"> <%= team2.name %> Maps </h4>
+            <% if(team2.mapStatistics != undefined) { %>
+              <table>
+                <tr>
+                  <th>Map</th>
+                  <th>Matches</th>
+                  <th>Winrate</th>
+                  <th>CT / T</th>
+                </tr>
+                <% for(var key in team2.mapStatistics) { %>
+                  <tr>
+                    <td><%=key%></td>
+                    <td><%=team2.mapStatistics[key].timesPlayed%></td>
+                    <td><%=team2.mapStatistics[key].winningPercentage%></td>
+                    <td><%=team2.mapStatistics[key].ctWinningPercentage%> / <%=team2.mapStatistics[key].tWinningPercentage%></td>
+                  </tr>
+                <% } %>
+              </table>
+            <% } %>
+          <% } %>
+        </div>
+      </div>
       <% if(error !== null){ %>
         <p><%= error %></p>
       <% } %>

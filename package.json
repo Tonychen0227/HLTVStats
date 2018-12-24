@@ -23,6 +23,8 @@
     "grep": "^0.1.0",
     "hltv": "^2.9.2",
     "http-proxy": "^1.17.0",
+    "moment": "^2.23.0",
+    "moment-timezone": "^0.5.23",
     "request": "^2.88.0",
     "socket.io": "^2.2.0",
     "socket.io-client": "^2.2.0",
