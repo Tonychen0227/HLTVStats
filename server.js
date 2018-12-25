@@ -172,6 +172,14 @@ app.get('/matches/scorebot', function (req, res) {
 app.get('/matches/matchanalysis', function (req, res) {
     console.log('Requesting analysis for ' + req.query.id);
     HLTV.getMatch({id: req.query.id}).then(async match => {
+        let team1Promise = undefined;
+        let team2Promise = undefined;
+        let team1playerPromise = undefined;
+        let team2playerPromise = undefined;
+        let headToHeadPromise = undefined;
+        let beginDate;
+        let endDate;
+        let combinedTeam;
         match.date = moment(match.date).tz('America/Vancouver').format('Y M-D ha z');
         if (match.team1 == undefined || match.team2 == undefined) {
             res.render('matchanalysis', {match: null, team1: null, team2: null, team1players: null, team2players: null, averageTeam1: 0, averageTeam2: 0, error: 'Match does not have both teams determined'});
@@ -179,18 +187,39 @@ app.get('/matches/matchanalysis', function (req, res) {
         if (match.headToHead) {
             for (var i = 0; i < match.headToHead.length; i++) {
                 if (moment().diff(moment(match.headToHead[i].date), 'days') > 90) {
-                    match.headToHead[i].date = moment(match.headToHead[i].date).format('M-D');
                     match.headToHead.splice(i, match.headToHead.length - i)
                     break;
-                } else {
-                    match.headToHead[i].date = moment(match.headToHead[i].date).format('M-D');
                 }
             }
+            headToheadPromise = new Promise(function(resolve, reject) {
+                console.log('Looking for head to heads');
+                let promises = [];
+                for (var i = 0; i < match.headToHead.length; i++) {
+                    beginDate = moment(match.headToHead[i].date).format('YYYY-MM-DD');
+                    endDate = beginDate;
+                    console.log(match.headToHead[i].date, beginDate);
+                    promises.push(new Promise(function(resolve, reject) {
+                        HLTV.getMatchesStats({startDate: beginDate, endDate: endDate}).then(results => {
+                            console.log(match.headToHead[i]);
+                            for (var k = 0; k < results.length; k++) {
+                                combinedTeam = results[k].team1.name + results[k].team2.name;
+                                if (combinedTeam.indexOf(match.team1.name) != -1 || combinedTeam.indexOf(match.team2.name) != -1) {
+                                    match.headToHead[i].id = results[k].id;
+                                }
+                            }
+                            resolve();
+                        })
+                    }));
+                }
+                Promise.all(promises).then(values => {
+                    for (var i = 0; i < match.headToHead.length; i++) {
+                        match.headToHead[i].date = moment(match.headToHead[i].date).format('M-D');
+                    }
+                    console.log(values);
+                    resolve(values);
+                })
+            })
         }
-        let team1Promise = undefined;
-        let team2Promise = undefined;
-        let team1playerPromise = undefined;
-        let team2playerPromise = undefined;
         if (match.team1 != undefined && match.team1.id != undefined) {
             team1Promise = new Promise(function(resolve, reject) {
                 let output = {};
@@ -265,7 +294,8 @@ app.get('/matches/matchanalysis', function (req, res) {
                 resolve(output);
             });
         }
-        Promise.all([team1Promise, team2Promise, team1playerPromise, team2playerPromise]).then(function(values) {
+        Promise.all([team1Promise, team2Promise, team1playerPromise, team2playerPromise, headToHeadPromise]).then(function(values) {
+            console.log('Ready to render');
             let tempPlayerList = [];
             let averageTeam1 = 0;
             let team1Counter = 0;
