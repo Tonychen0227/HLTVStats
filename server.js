@@ -176,7 +176,7 @@ app.get('/matches/matchanalysis', function (req, res) {
         let team2Promise = undefined;
         let team1playerPromise = undefined;
         let team2playerPromise = undefined;
-        let headToHeadPromise = undefined;
+        let head2headpromises = undefined;
         let beginDate;
         let endDate;
         let combinedTeam;
@@ -191,35 +191,34 @@ app.get('/matches/matchanalysis', function (req, res) {
                     break;
                 }
             }
-            headToheadPromise = new Promise(function(resolve, reject) {
-                console.log('Looking for head to heads');
-                let promises = [];
-                for (var i = 0; i < match.headToHead.length; i++) {
-                    beginDate = moment(match.headToHead[i].date).format('YYYY-MM-DD');
-                    endDate = beginDate;
-                    console.log(match.headToHead[i].date, beginDate);
-                    promises.push(new Promise(function(resolve, reject) {
-                        HLTV.getMatchesStats({startDate: beginDate, endDate: endDate}).then(results => {
-                            console.log(match.headToHead[i]);
-                            for (var k = 0; k < results.length; k++) {
-                                combinedTeam = results[k].team1.name + results[k].team2.name;
-                                if (combinedTeam.indexOf(match.team1.name) != -1 || combinedTeam.indexOf(match.team2.name) != -1) {
-                                    match.headToHead[i].id = results[k].id;
+            head2headpromises = [];
+            for (var i = 0; i < match.headToHead.length; i++) {
+                beginDate = moment(match.headToHead[i].date).format('YYYY-MM-DD');
+                endDate = moment(match.headToHead[i].date).add(1, 'days').format('YYYY-MM-DD');
+                head2headpromises.push(new Promise(function(resolve, reject) {
+                    HLTV.getMatchesStats({startDate: beginDate, endDate: endDate}).then(results => {
+                        let output = [];
+                        for (var k = 0; k < results.length; k++) {
+                            combinedTeam = results[k].team1.name + results[k].team2.name;
+                            if (combinedTeam.indexOf(match.team1.name) != -1 && combinedTeam.indexOf(match.team2.name) != -1) {
+                                results[k].date = moment(results[k].date).format('M-D');
+                                if (results[k].team1.name.indexOf(match.team1.name) == -1) {
+                                    let temp1;
+                                    temp1 = results[k].team1
+                                    results[k].team1 = results[k].team2;
+                                    results[k].team2 = temp1;
+                                    temp1 = results[k].result.team1;
+                                    results[k].result.team1 = results[k].result.team2;
+                                    results[k].result.team2 = temp1;
                                 }
+                                output.push(results[k]);
                             }
-                            resolve();
-                        })
-                    }));
-                }
-                Promise.all(promises).then(values => {
-                    for (var i = 0; i < match.headToHead.length; i++) {
-                        match.headToHead[i].date = moment(match.headToHead[i].date).format('M-D');
-                    }
-                    console.log(values);
-                    resolve(values);
-                })
-            })
-        }
+                        }
+                        resolve(output);
+                    })
+                }))
+            }
+            }
         if (match.team1 != undefined && match.team1.id != undefined) {
             team1Promise = new Promise(function(resolve, reject) {
                 let output = {};
@@ -294,63 +293,75 @@ app.get('/matches/matchanalysis', function (req, res) {
                 resolve(output);
             });
         }
-        Promise.all([team1Promise, team2Promise, team1playerPromise, team2playerPromise, headToHeadPromise]).then(function(values) {
-            console.log('Ready to render');
-            let tempPlayerList = [];
-            let averageTeam1 = 0;
-            let team1Counter = 0;
-            let averageTeam2 = 0;
-            let team2Counter = 0;
-            for (var i = 0; i < values[2].length; i++) {
-                if (values[2][i].rating) {
-                    averageTeam1 = averageTeam1 + parseFloat(values[2][i].rating);
-                    team1Counter = team1Counter + 1;
-                }
-                value = values[2][i];
-                if (tempPlayerList.length == 0) {
-                    tempPlayerList.push(value);
-                    continue;
-                }
-                for (var k = 0; k < tempPlayerList.length; k++) {
-                    if (tempPlayerList[k].rating == undefined || value.rating > tempPlayerList[k].rating) {
-                        tempPlayerList.splice(k, 0, value);
-                        break;
+        Promise.all([team1Promise, team2Promise, team1playerPromise, team2playerPromise]).then(function(values) {
+            Promise.all(head2headpromises).then(function (h2h) {
+                let filteredh2h = [];
+                let filteredh2hIDs = [];
+                for (var i = 0; i < h2h.length; i++) {
+                    for (var k = 0; k < h2h[i].length; k++) {
+                        if (!filteredh2hIDs.includes(h2h[i][k].id)) {
+                            filteredh2h.push(h2h[i][k]);
+                            filteredh2hIDs.push(h2h[i][k].id);
+                        }
                     }
-                    if (k == tempPlayerList.length - 1) {
+                }
+                console.log('Ready to render');
+                let tempPlayerList = [];
+                let averageTeam1 = 0;
+                let team1Counter = 0;
+                let averageTeam2 = 0;
+                let team2Counter = 0;
+                for (var i = 0; i < values[2].length; i++) {
+                    if (values[2][i].rating) {
+                        averageTeam1 = averageTeam1 + parseFloat(values[2][i].rating);
+                        team1Counter = team1Counter + 1;
+                    }
+                    value = values[2][i];
+                    if (tempPlayerList.length == 0) {
                         tempPlayerList.push(value);
-                        break;
+                        continue;
+                    }
+                    for (var k = 0; k < tempPlayerList.length; k++) {
+                        if (tempPlayerList[k].rating == undefined || value.rating > tempPlayerList[k].rating) {
+                            tempPlayerList.splice(k, 0, value);
+                            break;
+                        }
+                        if (k == tempPlayerList.length - 1) {
+                            tempPlayerList.push(value);
+                            break;
+                        }
                     }
                 }
-            }
-            values.splice(2, 1, tempPlayerList);
-            tempPlayerList = [];
-            for (var i = 0; i < values[3].length; i++) {
-                if (values[3][i].rating) {
-                    averageTeam2 = averageTeam2 + parseFloat(values[3][i].rating);
-                    team2Counter = team2Counter + 1;
-                }
-                value = values[3][i];
-                if (tempPlayerList.length == 0) {
-                    tempPlayerList.push(value);
-                    continue;
-                }
-                for (var k = 0; k < tempPlayerList.length; k++) {
-                    if (tempPlayerList[k].rating == undefined || value.rating > tempPlayerList[k].rating) {
-                        tempPlayerList.splice(k, 0, value);
-                        break;
+                values.splice(2, 1, tempPlayerList);
+                tempPlayerList = [];
+                for (var i = 0; i < values[3].length; i++) {
+                    if (values[3][i].rating) {
+                        averageTeam2 = averageTeam2 + parseFloat(values[3][i].rating);
+                        team2Counter = team2Counter + 1;
                     }
-                    if (k == tempPlayerList.length - 1) {
+                    value = values[3][i];
+                    if (tempPlayerList.length == 0) {
                         tempPlayerList.push(value);
-                        break;
+                        continue;
+                    }
+                    for (var k = 0; k < tempPlayerList.length; k++) {
+                        if (tempPlayerList[k].rating == undefined || value.rating > tempPlayerList[k].rating) {
+                            tempPlayerList.splice(k, 0, value);
+                            break;
+                        }
+                        if (k == tempPlayerList.length - 1) {
+                            tempPlayerList.push(value);
+                            break;
+                        }
                     }
                 }
-            }
-            values.splice(3, 1, tempPlayerList);
-            res.render('matchanalysis', {match: match, team1: values[0], team2: values[1], team1players: values[2], team2players: values[3], averageTeam1: (averageTeam1/team1Counter).toFixed(2), averageTeam2: (averageTeam2/team2Counter).toFixed(2), error: null});
+                values.splice(3, 1, tempPlayerList);
+                res.render('matchanalysis', {match: match, team1: values[0], team2: values[1], team1players: values[2], team2players: values[3], averageTeam1: (averageTeam1/team1Counter).toFixed(2), averageTeam2: (averageTeam2/team2Counter).toFixed(2), headToHead: filteredh2h, error: null});
+            })
         })
     }).catch(err => {
         console.log(err)
-        res.render('matchanalysis', {match: null, team1: null, team2: null, team1players: null, team2players: null, averageTeam1: 0, averageTeam2: 0, error: 'An error occurred'});
+        res.render('matchanalysis', {match: null, team1: null, team2: null, team1players: null, team2players: null, averageTeam1: 0, averageTeam2: 0, headToHead: null, error: 'An error occurred'});
     })
 })
 

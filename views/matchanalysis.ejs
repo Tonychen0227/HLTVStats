@@ -47,19 +47,21 @@
             <br>
           <% } %>
         <% } %>
-        <% if(match.headToHead) { %>
+        <% if(headToHead) { %>
           <h4 align="center"> Head to head (90 days) </h4>
           <table>
             <tr>
+              <th>Details</th>
               <th>Date</th>
               <th>Map</th>
               <th>Result</th>
             </tr>
-            <% for(var i = 0; i < match.headToHead.length; i++) { %>
+            <% for(var i = 0; i < headToHead.length; i++) { %>
               <tr>
-                <td><%=match.headToHead[i].date%></td>
-                <td><%=match.headToHead[i].map%></td>
-                <td><%=match.headToHead[i].result%></td>
+                <td><a href="/results/detailedstats?id=<%=headToHead[i].id%>"> View </a></td>
+                <td><%=headToHead[i].date%></td>
+                <td><%=headToHead[i].map%></td>
+                <td><%=headToHead[i].result.team1%>-<%=headToHead[i].result.team2%></td>
               </tr>
             <% } %>
           </table>
