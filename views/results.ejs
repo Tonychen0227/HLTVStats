@@ -35,9 +35,9 @@
             $('#status').html(''); // clear the HTML
             Object.keys(data).forEach((name) => {
               if (data[name].name == "") {
-                $('#status').append('<h5>' + name.substr(0, name.indexOf('GMT')) + '</h5>' + '<h6>' + data[name].comment + '</h6>');
+                $('#status').append('<h5>' + name.substr(0, name.indexOf('GMT')) + 'by Anonymous' + '</h5>' + '<h6>' + data[name].comment + '</h6>');
               } else {
-                $('#status').append('<h5>' + name.substr(0, name.indexOf('GMT')) + 'by ' + data[name].name + '</h5>' + '<h6>' + data[name].name + ": " + data[name].comment + '</h6>');
+                $('#status').append('<h5>' + name.substr(0, name.indexOf('GMT')) + 'by ' + data[name].name + '</h5>' + '<h6>' + data[name].comment + '</h6>');
               }
           })
           }
@@ -48,20 +48,11 @@
             $('#status').html(''); // clear the HTML
             Object.keys(data).forEach((name) => {
               if (data[name].name == "") {
-                $('#status').append('<h5>' + name.substr(0, name.indexOf('GMT')) + '</h5>' + '<h6>' + data[name].comment + '</h6>');
+                $('#status').append('<h5>' + name.substr(0, name.indexOf('GMT')) + 'by Anonymous' +'</h5>' + '<h6>' + data[name].comment + '</h6>');
               } else {
-                $('#status').append('<h5>' + name.substr(0, name.indexOf('GMT')) + 'by ' + data[name].name + '</h5>' + '<h6>' + data[name].name + ": " + data[name].comment + '</h6>');
+                $('#status').append('<h5>' + name.substr(0, name.indexOf('GMT')) + 'by ' + data[name].name + '</h5>' + '<h6>' + data[name].comment + '</h6>');
               }
           })
-          }
-        });
-        database.ref('results/' + $.urlParam('id')).once('value', (snapshot) => {
-          const data = snapshot.val();
-          if (data) {
-            $('#status').html(''); // clear the HTML
-            Object.keys(data).forEach((name) => {
-              $('#status').append('<h5>' + name.substr(0, name.indexOf('GMT')) + '</h5>' + '<h6>' + data[name].name + " " + data[name].comment + '</h6>');
-            });
           }
         });
         $('#insertButton').click(() => {
