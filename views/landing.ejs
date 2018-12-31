@@ -5,67 +5,6 @@
     <title>HLTV Stats</title>
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
-    <script src="https://www.gstatic.com/firebasejs/5.7.2/firebase.js"></script>
-    <script>
-        // Initialize Firebase
-        var config = {
-          apiKey: "AIzaSyDrHFGN50kcJtRFBkw89yedrmTw7fhxXrE",
-          authDomain: "hltvstats-20d23.firebaseapp.com",
-          databaseURL: "https://hltvstats-20d23.firebaseio.com",
-          projectId: "hltvstats-20d23",
-          storageBucket: "hltvstats-20d23.appspot.com",
-          messagingSenderId: "626499430202"
-        };
-        firebase.initializeApp(config);
-      </script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script type="text/javascript">
-      $.urlParam = function(name){
-          var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-          if (results==null) {
-            return null;
-          }
-          return decodeURI(results[1]) || 0;
-      }
-      $(function() {
-        const date = new Date().toDateString();
-        const database = firebase.database();
-        database.ref('home/' + date).once('value', (snapshot) => {
-          const data = snapshot.val();
-          if (data) {
-            $('#status').html(''); // clear the HTML
-            Object.keys(data).forEach((name) => {
-              if (data[name].name == "") {
-                $('#status').append('<h5>' + name.substr(0, name.indexOf('GMT')) + 'by Anonymous' + '</h5>' + '<h6>' + data[name].comment + '</h6>');
-              } else {
-                $('#status').append('<h5>' + name.substr(0, name.indexOf('GMT')) + 'by ' + data[name].name + '</h5>' + '<h6>' + data[name].comment + '</h6>');
-              }
-          })
-          }
-        })
-        database.ref('home/' + date).on('value', (snapshot) => {
-          const data = snapshot.val();
-          if (data) {
-            $('#status').html(''); // clear the HTML
-            Object.keys(data).forEach((name) => {
-              if (data[name].name == "") {
-                $('#status').append('<h5>' + name.substr(0, name.indexOf('GMT')) + 'by Anonymous' + '</h5>' + '<h6>' + data[name].comment + '</h6>');
-              } else {
-                $('#status').append('<h5>' + name.substr(0, name.indexOf('GMT')) + 'by ' + data[name].name + '</h5>' + '<h6>' + data[name].comment + '</h6>');
-              }
-          })
-          }
-        });
-        $('#insertButton').click(() => {
-          if ( $('#commentInput').val() !== '') {
-            database.ref('home/' + date + '/' + new Date()).set({
-            name: $('#nameInput').val(),
-            comment: $('#commentInput').val()
-          })
-          }
-        })
-      });
-    </script>
   </head>
   <body>
     <fieldset>
