@@ -455,7 +455,7 @@ app.post('/matches', function (req, res) {
 
 app.get('/results', function (req, res) {
     if (req.query.id == undefined) {
-        res.render('results', {match: null, error: 'ID is missing'});
+        res.render('results', {result: null, error: 'ID is missing'});
         return;
     }
     console.log('Requesting match ' + req.query.id);
@@ -467,9 +467,12 @@ app.get('/results', function (req, res) {
 })
 
 app.post('/matchresults', function (req, res) {
-    let teamParam = req.body.teamname.toUpperCase() || "";
+    let teamParam = req.body.teamname || "";
     let pageParam = req.body.pages || 1;
-    let eventParam = req.body.eventname.toUpperCase() || "";
+    let eventParam = req.body.eventname || "";
+
+    teamParam = teamParam.toUpperCase();
+    eventParam = eventParam.toUpperCase();
     console.log('Requesting match results ' + teamParam + eventParam + pageParam);
     HLTV.getResults({pages: pageParam}).then((answer) => {
         let results = answer
@@ -482,7 +485,6 @@ app.post('/matchresults', function (req, res) {
                 let team2 = results[i].team2.name.toUpperCase();
                 let event = results[i].event.name.toUpperCase();
                 results[i].date = moment(results[i].date).tz('America/Vancouver').format('Y M-D ha z');
-                console.log(teamParam, eventParam, team1, team2, event);
                 if (((team1.indexOf(teamParam) != -1 || 
                 team2.indexOf(teamParam) != -1) && teamParam != "")||
                 (event.indexOf(eventParam) != -1 && eventParam != "")) {
