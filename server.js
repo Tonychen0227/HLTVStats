@@ -151,7 +151,7 @@ function connect(id) {
 
 app.get('/matches/scorebot', function (req, res) {
     console.log('Requesting updated data for ' + req.query.id);
-    if (res.query.id == undefined) {
+    if (req.query.id == undefined) {
         res.render('scorebot', {match: null, update: null, log: null, error: 'Please enter an ID'});
         return;
     }
