@@ -151,6 +151,10 @@ function connect(id) {
 
 app.get('/matches/scorebot', function (req, res) {
     console.log('Requesting updated data for ' + req.query.id);
+    if (req.query.id == undefined) {
+        res.render('scorebot', {match: null, update: null, log: null, error: 'Please enter an ID'});
+        return;
+    }
     HLTV.getMatch({id: req.query.id}).then(match => {
         match.date = moment(match.date).tz('America/Vancouver').format('Y M-D ha z');
         if (connectedScorebots.indexOf(req.query.id) != -1) {
